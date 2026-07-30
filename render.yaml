@@ -4,7 +4,11 @@ services:
     runtime: python
     plan: pro
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "uvicorn backend_api:app --host 0.0.0.0 --port $PORT"
+    startCommand: "uvicorn backend_api:app --host 0.0.0.0 --port $PORT --workers 1"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
+      - key: WEB_CONCURRENCY
+        value: "1"
+      - key: QT_QPA_PLATFORM
+        value: "offscreen"
