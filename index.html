@@ -548,24 +548,52 @@ dropzone.addEventListener('drop', (e) => {
     if (file && file.type.startsWith('audio/')) handleFile(file);
 });
 
-function startTranscription() {
+const API_URL = "https://pianomagic.onrender.com";
+
+async function startTranscription() {
     if (activeTab === 'file' && !currentFile) {
         alert('Выберите аудиофайл');
         return;
     }
-    if (activeTab === 'url' && !document.getElementById('url-input').value.trim()) {
-        alert('Введите ссылку на аудио');
-        return;
-    }
-
+    
     document.getElementById('panel-input').classList.add('hidden');
     document.getElementById('panel-processing').classList.remove('hidden');
+    setStep(1);
+    
+    try {
+        const formData = new FormData();
+        formData.append("file", currentFile);
+        
+        setStep(2);
+        
+        const response = await fetch(`${API_URL}/transcribe/file`, {
+            method: "POST",
+            body: formData
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || "Ошибка сервера");
+        }
+        
+        const data = await response.json();
+        setStep(3);
+        
+        // Сохраняем URL для скачивания
+        window.pdfDownloadUrl = `${API_URL}${data.pdf_url}`;
+        
+        setTimeout(() => showResult(data), 1000);
+        
+    } catch (err) {
+        alert("Ошибка: " + err.message);
+        resetApp();
+    }
+}
 
-    // Симуляция шагов обработки
-    setTimeout(() => setStep(1), 100);
-    setTimeout(() => setStep(2), 1500);
-    setTimeout(() => setStep(3), 3500);
-    setTimeout(() => showResult(), 5000);
+function downloadPDF() {
+    if (window.pdfDownloadUrl) {
+        window.open(window.pdfDownloadUrl, '_blank');
+    }
 }
 
 function setStep(n) {
