@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Piano Transcription</title>
+    <title>PianoMagic — Аудио в ноты</title>
     <style>
         :root {
             --bg: #0f0f0f;
@@ -15,6 +15,7 @@
             --text-tertiary: #555;
             --accent: #4f8ef7;
             --positive: #4caf50;
+            --danger: #f44336;
             --radius: 12px;
             --radius-sm: 8px;
             --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -82,11 +83,13 @@
             justify-content: center;
             gap: 8px;
             transition: all 0.2s;
+            border: none;
+            font-family: inherit;
         }
         .tab.active {
             background: var(--surface-raised);
             color: var(--text-primary);
-            border-color: var(--text-tertiary);
+            border: 1px solid var(--text-tertiary);
         }
         .tab:hover:not(.active) {
             border-color: var(--text-tertiary);
@@ -288,16 +291,6 @@
             height: 28px;
             background: #000;
         }
-        .note.quarter::before {
-            content: '';
-            position: absolute;
-            right: -2px;
-            top: -24px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #000;
-        }
 
         .actions {
             display: flex;
@@ -317,6 +310,7 @@
             gap: 8px;
             transition: all 0.2s;
             border: 1px solid var(--border);
+            text-decoration: none;
         }
         .btn-secondary {
             background: var(--surface-raised);
@@ -330,8 +324,21 @@
         }
         .btn-accent:hover { opacity: 0.9; }
 
-        .hidden { display: none !important; }
+        .error-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(244, 67, 54, 0.12);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            border-radius: 100px;
+            color: var(--danger);
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 24px;
+        }
 
+        .hidden { display: none !important; }
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -348,7 +355,7 @@
             </svg>
         </div>
         <div>
-            <h1>Piano Transcription</h1>
+            <h1>PianoMagic</h1>
             <p>Аудио в ноты за несколько секунд</p>
         </div>
     </div>
@@ -414,8 +421,8 @@
         <div class="processing">
             <div class="spinner"><div class="spinner-ring"></div></div>
             <h3 style="font-size: 17px; font-weight: 500; margin-bottom: 8px;">Обработка аудио...</h3>
-            <p style="font-size: 14px; color: var(--text-secondary);">Это может занять 30–60 секунд</p>
-            
+            <p style="font-size: 14px; color: var(--text-secondary);" id="status-text">Загрузка файла</p>
+
             <div class="steps">
                 <div class="step active" id="step-1">
                     <div class="step-icon">
@@ -449,7 +456,7 @@
 
     <div class="panel hidden fade-in" id="panel-result">
         <div class="result">
-            <div class="result-badge">
+            <div class="result-badge" id="result-badge">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M19.3027 5.9053C19.6542 5.55397 20.2247 5.55388 20.5761 5.9053C20.9273 6.25675 20.9273 6.82734 20.5761 7.17874L9.65911 18.0948C9.30773 18.4461 8.73814 18.446 8.38665 18.0948L3.42376 13.1328C3.0726 12.7814 3.07263 12.2118 3.42376 11.8604C3.77524 11.509 4.34575 11.5089 4.6972 11.8604L9.02239 16.1856L19.3027 5.9053Z" fill="currentColor"/>
                 </svg>
@@ -497,18 +504,33 @@
                     </svg>
                     Новая песня
                 </button>
-                <button class="btn btn-accent" onclick="downloadPDF()">
+                <a class="btn btn-accent" id="download-btn" href="#" target="_blank">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2.90002C12.4971 2.90002 12.9 3.30297 12.9 3.80002V12.2939L15.8081 9.38585C16.1595 9.03438 16.7294 9.03438 17.0808 9.38585C17.4323 9.73732 17.4323 10.3072 17.0808 10.6586L12.6364 15.1031C12.4676 15.2719 12.2387 15.3667 12 15.3667C11.7613 15.3667 11.5324 15.2719 11.3636 15.1031L6.91917 10.6586C6.5677 10.3072 6.5677 9.73732 6.91917 9.38585C7.27064 9.03438 7.84049 9.03438 8.19196 9.38585L11.1 12.2939V3.80002C11.1 3.30297 11.503 2.90002 12 2.90002ZM4.00001 13.5874C4.49706 13.5874 4.90001 13.9903 4.90001 14.4874V18.043C4.90001 18.2758 4.99249 18.499 5.1571 18.6636C5.32172 18.8282 5.54498 18.9207 5.77778 18.9207H18.2222C18.455 18.9207 18.6783 18.8283 18.8429 18.6636C19.0075 18.499 19.1 18.2758 19.1 18.043V14.4874C19.1 13.9903 19.5029 13.5874 20 13.5874C20.4971 13.5874 20.9 13.9903 20.9 14.4874V18.043C20.9 18.7531 20.6179 19.4342 20.1157 19.9364C19.6135 20.4386 18.9324 20.7207 18.2222 20.7207H5.77778C5.06759 20.7207 4.38649 20.4386 3.88431 19.9364C3.38213 19.4342 3.10001 18.7531 3.10001 18.043V14.4874C3.10001 13.9903 3.50295 13.5874 4.00001 13.5874Z" fill="currentColor"/>
                     </svg>
                     Скачать PDF
-                </button>
+                </a>
             </div>
+        </div>
+    </div>
+
+    <div class="panel hidden fade-in" id="panel-error">
+        <div class="result">
+            <div class="error-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="currentColor"/>
+                </svg>
+                <span id="error-text">Произошла ошибка</span>
+            </div>
+            <button class="btn btn-secondary" onclick="resetApp()" style="max-width: 200px; margin: 0 auto;">
+                Попробовать снова
+            </button>
         </div>
     </div>
 </div>
 
 <script>
+const API_URL = "https://pianomagic.onrender.com";
 let currentFile = null;
 let activeTab = 'file';
 
@@ -537,7 +559,6 @@ function clearFile(e) {
     document.getElementById('dropzone').classList.remove('hidden');
 }
 
-// Drag & drop
 const dropzone = document.getElementById('dropzone');
 dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
 dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
@@ -548,54 +569,6 @@ dropzone.addEventListener('drop', (e) => {
     if (file && file.type.startsWith('audio/')) handleFile(file);
 });
 
-const API_URL = "https://pianomagic.onrender.com";
-
-async function startTranscription() {
-    if (activeTab === 'file' && !currentFile) {
-        alert('Выберите аудиофайл');
-        return;
-    }
-    
-    document.getElementById('panel-input').classList.add('hidden');
-    document.getElementById('panel-processing').classList.remove('hidden');
-    setStep(1);
-    
-    try {
-        const formData = new FormData();
-        formData.append("file", currentFile);
-        
-        setStep(2);
-        
-        const response = await fetch(`${API_URL}/transcribe/file`, {
-            method: "POST",
-            body: formData
-        });
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.detail || "Ошибка сервера");
-        }
-        
-        const data = await response.json();
-        setStep(3);
-        
-        // Сохраняем URL для скачивания
-        window.pdfDownloadUrl = `${API_URL}${data.pdf_url}`;
-        
-        setTimeout(() => showResult(data), 1000);
-        
-    } catch (err) {
-        alert("Ошибка: " + err.message);
-        resetApp();
-    }
-}
-
-function downloadPDF() {
-    if (window.pdfDownloadUrl) {
-        window.open(window.pdfDownloadUrl, '_blank');
-    }
-}
-
 function setStep(n) {
     for (let i = 1; i <= 3; i++) {
         const el = document.getElementById('step-' + i);
@@ -605,12 +578,79 @@ function setStep(n) {
     }
 }
 
-function showResult() {
+function setStatus(text) {
+    document.getElementById('status-text').textContent = text;
+}
+
+async function startTranscription() {
+    if (activeTab === 'file' && !currentFile) {
+        alert('Выберите аудиофайл');
+        return;
+    }
+    if (activeTab === 'url') {
+        alert('Загрузка по ссылке пока недоступна. Используйте файл.');
+        return;
+    }
+
+    document.getElementById('panel-input').classList.add('hidden');
+    document.getElementById('panel-processing').classList.remove('hidden');
+    document.getElementById('panel-result').classList.add('hidden');
+    document.getElementById('panel-error').classList.add('hidden');
+
+    setStep(1);
+    setStatus('Загрузка файла...');
+
+    try {
+        const formData = new FormData();
+        formData.append("file", currentFile);
+
+        setStep(2);
+        setStatus('AI анализирует аудио...');
+
+        const response = await fetch(`${API_URL}/transcribe/file`, {
+            method: "POST",
+            body: formData
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.detail || `Ошибка сервера: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        setStep(3);
+        setStatus('Генерация нот...');
+
+        setTimeout(() => showResult(data), 800);
+
+    } catch (err) {
+        console.error(err);
+        showError(err.message || 'Не удалось обработать файл');
+    }
+}
+
+function showResult(data) {
     document.getElementById('panel-processing').classList.add('hidden');
     document.getElementById('panel-result').classList.remove('hidden');
-    
-    const name = activeTab === 'file' ? currentFile.name.replace(/\\.[^.]+$/, '') : 'YouTube Audio';
+
+    const name = currentFile ? currentFile.name.replace(/\.[^.]+$/, '') : 'Transcription';
     document.getElementById('sheet-title').textContent = name + ' — Piano Solo';
+
+    // Устанавливаем ссылку на скачивание
+    const downloadBtn = document.getElementById('download-btn');
+    if (data.pdf_url) {
+        downloadBtn.href = `${API_URL}${data.pdf_url}`;
+        downloadBtn.classList.remove('hidden');
+    } else {
+        downloadBtn.classList.add('hidden');
+    }
+}
+
+function showError(message) {
+    document.getElementById('panel-processing').classList.add('hidden');
+    document.getElementById('panel-error').classList.remove('hidden');
+    document.getElementById('error-text').textContent = message;
 }
 
 function resetApp() {
@@ -620,15 +660,13 @@ function resetApp() {
     document.getElementById('file-selected').classList.add('hidden');
     document.getElementById('dropzone').classList.remove('hidden');
     document.getElementById('panel-result').classList.add('hidden');
+    document.getElementById('panel-error').classList.add('hidden');
     document.getElementById('panel-input').classList.remove('hidden');
     for (let i = 1; i <= 3; i++) {
         document.getElementById('step-' + i).classList.remove('active', 'done');
     }
     document.getElementById('step-1').classList.add('active');
-}
-
-function downloadPDF() {
-    alert('В реальном приложении здесь скачивание PDF-файла с сервера');
+    setStatus('Загрузка файла');
 }
 </script>
 
