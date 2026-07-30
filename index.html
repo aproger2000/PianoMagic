@@ -6,525 +6,96 @@
     <title>PianoMagic — Аудио в ноты</title>
     <style>
         :root {
-            --bg: #0f0f0f;
-            --surface: #1a1a1a;
-            --surface-raised: #222;
-            --border: #333;
-            --text-primary: #f0f0f0;
-            --text-secondary: #888;
-            --text-tertiary: #555;
-            --accent: #4f8ef7;
-            --positive: #4caf50;
-            --danger: #f44336;
-            --radius: 12px;
-            --radius-sm: 8px;
+            --bg: #0f0f0f; --surface: #1a1a1a; --surface-raised: #222;
+            --border: #333; --text-primary: #f0f0f0; --text-secondary: #888;
+            --text-tertiary: #555; --accent: #4f8ef7; --positive: #4caf50;
+            --danger: #f44336; --radius: 12px; --radius-sm: 8px;
             --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: var(--font);
-            background: var(--bg);
-            color: var(--text-primary);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 40px 20px;
-        }
-        .app {
-            width: 100%;
-            max-width: 640px;
-            background: transparent;
-        }
-        .header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 32px;
-        }
-        .header-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--surface-raised);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-primary);
-        }
-        .header h1 {
-            font-size: 20px;
-            font-weight: 500;
-            letter-spacing: 0.01em;
-        }
-        .header p {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-top: 2px;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-        .tab {
-            flex: 1;
-            padding: 12px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            color: var(--text-secondary);
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s;
-            border: none;
-            font-family: inherit;
-        }
-        .tab.active {
-            background: var(--surface-raised);
-            color: var(--text-primary);
-            border: 1px solid var(--text-tertiary);
-        }
-        .tab:hover:not(.active) {
-            border-color: var(--text-tertiary);
-        }
-
-        .panel {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 24px;
-        }
-
-        .dropzone {
-            border: 2px dashed var(--border);
-            border-radius: var(--radius-sm);
-            padding: 48px 24px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-        }
-        .dropzone:hover, .dropzone.dragover {
-            border-color: var(--text-tertiary);
-            background: rgba(255,255,255,0.02);
-        }
+        body { font-family: var(--font); background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 40px 20px; }
+        .app { width: 100%; max-width: 640px; }
+        .header { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+        .header-icon { width: 40px; height: 40px; background: var(--surface-raised); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+        .header h1 { font-size: 20px; font-weight: 500; }
+        .header p { font-size: 14px; color: var(--text-secondary); margin-top: 2px; }
+        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
+        .dropzone { border: 2px dashed var(--border); border-radius: var(--radius-sm); padding: 48px 24px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .dropzone:hover, .dropzone.dragover { border-color: var(--text-tertiary); background: rgba(255,255,255,0.02); }
         .dropzone input { display: none; }
-        .dropzone-icon { color: var(--text-secondary); margin-bottom: 12px; }
         .dropzone h3 { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
         .dropzone p { font-size: 13px; color: var(--text-tertiary); }
-        .file-selected {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-top: 16px;
-            padding: 12px;
-            background: var(--surface-raised);
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-        }
-        .file-selected svg { color: var(--accent); flex-shrink: 0; }
+        .file-selected { display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 12px; background: var(--surface-raised); border-radius: var(--radius-sm); border: 1px solid var(--border); }
         .file-info { flex: 1; min-width: 0; }
         .file-name { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .file-size { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; }
-
-        .url-input {
-            width: 100%;
-            padding: 14px 16px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            color: var(--text-primary);
-            font-size: 15px;
-            font-family: inherit;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .url-input:focus { border-color: var(--text-tertiary); }
-        .url-input::placeholder { color: var(--text-tertiary); }
-
-        .btn-primary {
-            width: 100%;
-            margin-top: 20px;
-            padding: 14px;
-            background: var(--text-primary);
-            color: var(--bg);
-            border: none;
-            border-radius: var(--radius-sm);
-            font-size: 15px;
-            font-weight: 500;
-            font-family: inherit;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: opacity 0.2s;
-        }
+        .btn-primary { width: 100%; margin-top: 20px; padding: 14px; background: var(--text-primary); color: var(--bg); border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 500; font-family: inherit; cursor: pointer; transition: opacity 0.2s; }
         .btn-primary:hover { opacity: 0.9; }
         .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-
-        .processing {
-            text-align: center;
-            padding: 40px 20px;
-        }
-        .spinner {
-            width: 48px;
-            height: 48px;
-            margin: 0 auto 20px;
-            position: relative;
-        }
-        .spinner-ring {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border: 3px solid var(--border);
-            border-top-color: var(--text-primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
+        .processing { text-align: center; padding: 40px 20px; }
+        .spinner { width: 48px; height: 48px; margin: 0 auto 20px; border: 3px solid var(--border); border-top-color: var(--text-primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        .steps {
-            display: flex;
-            justify-content: center;
-            gap: 32px;
-            margin-top: 24px;
-        }
-        .step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            position: relative;
-        }
-        .step-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--surface-raised);
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-tertiary);
-            transition: all 0.3s;
-        }
-        .step.active .step-icon {
-            border-color: var(--text-primary);
-            color: var(--text-primary);
-            box-shadow: 0 0 0 3px rgba(240,240,240,0.1);
-        }
-        .step.done .step-icon {
-            background: var(--positive);
-            border-color: var(--positive);
-            color: var(--bg);
-        }
-        .step-label { font-size: 12px; color: var(--text-tertiary); }
-        .step.active .step-label { color: var(--text-primary); }
-        .step.done .step-label { color: var(--positive); }
-
-        .result {
-            text-align: center;
-        }
-        .result-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: rgba(76, 175, 80, 0.12);
-            border: 1px solid rgba(76, 175, 80, 0.3);
-            border-radius: 100px;
-            color: var(--positive);
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 24px;
-        }
-        .sheet-preview {
-            background: #fff;
-            border-radius: var(--radius-sm);
-            padding: 32px;
-            margin-bottom: 24px;
-            position: relative;
-            overflow: hidden;
-        }
-        .sheet-title {
-            color: #333;
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            text-align: left;
-            font-family: Georgia, serif;
-        }
-        .staff {
-            position: relative;
-            height: 80px;
-            margin-bottom: 8px;
-        }
-        .staff-line {
-            position: absolute;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: #333;
-        }
-        .note {
-            position: absolute;
-            width: 14px;
-            height: 10px;
-            background: #000;
-            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-            transform: rotate(-15deg);
-        }
-        .note::after {
-            content: '';
-            position: absolute;
-            right: -2px;
-            top: -24px;
-            width: 2px;
-            height: 28px;
-            background: #000;
-        }
-
-        .actions {
-            display: flex;
-            gap: 12px;
-        }
-        .btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: var(--radius-sm);
-            font-size: 14px;
-            font-weight: 500;
-            font-family: inherit;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s;
-            border: 1px solid var(--border);
-            text-decoration: none;
-        }
-        .btn-secondary {
-            background: var(--surface-raised);
-            color: var(--text-primary);
-        }
-        .btn-secondary:hover { border-color: var(--text-tertiary); }
-        .btn-accent {
-            background: var(--text-primary);
-            color: var(--bg);
-            border-color: var(--text-primary);
-        }
-        .btn-accent:hover { opacity: 0.9; }
-
-        .error-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: rgba(244, 67, 54, 0.12);
-            border: 1px solid rgba(244, 67, 54, 0.3);
-            border-radius: 100px;
-            color: var(--danger);
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 24px;
-        }
-
+        .status-text { font-size: 14px; color: var(--text-secondary); margin-top: 12px; }
+        .result { text-align: center; }
+        .result-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(76,175,80,0.12); border: 1px solid rgba(76,175,80,0.3); border-radius: 100px; color: var(--positive); font-size: 14px; font-weight: 500; margin-bottom: 24px; }
+        .error-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(244,67,54,0.12); border: 1px solid rgba(244,67,54,0.3); border-radius: 100px; color: var(--danger); font-size: 14px; font-weight: 500; margin-bottom: 24px; }
+        .actions { display: flex; gap: 12px; }
+        .btn { flex: 1; padding: 12px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--border); text-decoration: none; }
+        .btn-secondary { background: var(--surface-raised); color: var(--text-primary); }
+        .btn-accent { background: var(--text-primary); color: var(--bg); border-color: var(--text-primary); }
         .hidden { display: none !important; }
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
-
 <div class="app">
     <div class="header">
-        <div class="header-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M8 12.0993C8.49691 12.0993 8.90016 12.5028 8.90039 12.9997V17.9997C8.90039 19.6013 7.60163 20.9001 6 20.9001C4.39837 20.9001 3.09961 19.6013 3.09961 17.9997C3.09984 16.3982 4.39852 15.0993 6 15.0993C6.38939 15.0993 6.76033 15.1778 7.09961 15.317V12.9997C7.09984 12.5028 7.50309 12.0993 8 12.0993ZM6 16.9001C5.39263 16.9001 4.90062 17.3923 4.90039 17.9997C4.90039 18.6072 5.39249 19.0993 6 19.0993C6.60751 19.0993 7.09961 18.6072 7.09961 17.9997C7.09938 17.3923 6.60737 16.9001 6 16.9001Z" fill="currentColor"/>
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M18.627 3.35611C19.8025 3.12106 20.9001 4.02068 20.9004 5.21939V15.9997C20.9004 17.6013 19.6016 18.9001 18 18.9001C16.3984 18.9001 15.0996 17.6013 15.0996 15.9997C15.0998 14.3982 16.3985 13.0993 18 13.0993C18.3894 13.0993 18.7603 13.1778 19.0996 13.317V9.21939C19.0993 9.15657 19.0421 9.10946 18.9805 9.12173L12.6768 10.3825C12.1894 10.4799 11.7148 10.1637 11.6172 9.67642C11.52 9.18922 11.8361 8.71439 12.3232 8.61685L18.627 7.35611C18.7868 7.32415 18.9452 7.31502 19.0996 7.32291V5.21939C19.0993 5.15657 19.0421 5.10946 18.9805 5.12173L12.6768 6.38248C12.1894 6.47994 11.7148 6.16372 11.6172 5.67642C11.52 5.18922 11.8361 4.71439 12.3232 4.61685L18.627 3.35611ZM18 14.9001C17.3926 14.9001 16.9006 15.3923 16.9004 15.9997C16.9004 16.6072 17.3925 17.0993 18 17.0993C18.6075 17.0993 19.0996 16.6072 19.0996 15.9997C19.0994 15.3923 18.6074 14.9001 18 14.9001Z" fill="currentColor"/>
-                <path d="M7.32422 5.38931C7.61669 4.87032 8.38346 4.87015 8.67578 5.38931L8.73047 5.50845L8.89551 5.95376L8.97949 6.1481C9.19937 6.58817 9.57968 6.93145 10.0459 7.10415L10.4912 7.26919C11.127 7.50461 11.1666 8.36217 10.6104 8.67544L10.4912 8.73013L10.0459 8.89517C9.5799 9.06783 9.19939 9.41141 8.97949 9.85123L8.89551 10.0456L8.73047 10.4909C8.49495 11.1267 7.63737 11.1665 7.32422 10.61L7.26953 10.4909L7.10449 10.0456C6.93172 9.57931 6.58767 9.19898 6.14746 8.97916L5.9541 8.89517L5.50879 8.73013C4.83054 8.47903 4.83061 7.52037 5.50879 7.26919L5.9541 7.10415L6.14746 7.02017C6.58757 6.80032 6.93176 6.41995 7.10449 5.95376L7.26953 5.50845L7.32422 5.38931Z" fill="currentColor"/>
-            </svg>
-        </div>
+        <div class="header-icon">🎹</div>
         <div>
             <h1>PianoMagic</h1>
             <p>Аудио в ноты за несколько секунд</p>
         </div>
     </div>
 
-    <div class="tabs">
-        <button class="tab active" onclick="switchTab('file')" id="tab-file">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.3636 3.36358C11.7151 3.01211 12.2849 3.01211 12.6364 3.36358L17.0808 7.80802C17.4323 8.1595 17.4323 8.72934 17.0808 9.08082C16.7293 9.43229 16.1595 9.43229 15.808 9.08082L12.9 6.17277V14.6666C12.9 15.1637 12.497 15.5666 12 15.5666C11.5029 15.5666 11.1 15.1637 11.1 14.6666V6.17277L8.19193 9.08082C7.84046 9.43229 7.27061 9.43229 6.91914 9.08082C6.56766 8.72934 6.56766 8.1595 6.91914 7.80802L11.3636 3.36358ZM3.99998 13.7666C4.49703 13.7666 4.89998 14.1696 4.89998 14.6666V18.2222C4.89998 18.455 4.99246 18.6783 5.15707 18.8429C5.32169 19.0075 5.54495 19.1 5.77775 19.1H18.2222C18.455 19.1 18.6783 19.0075 18.8429 18.8429C19.0075 18.6783 19.1 18.455 19.1 18.2222V14.6666C19.1 14.1696 19.5029 13.7666 20 13.7666C20.497 13.7666 20.9 14.1696 20.9 14.6666V18.2222C20.9 18.9324 20.6179 19.6135 20.1157 20.1157C19.6135 20.6179 18.9324 20.9 18.2222 20.9H5.77775C5.06756 20.9 4.38646 20.6179 3.88428 20.1157C3.3821 19.6135 3.09998 18.9324 3.09998 18.2222V14.6666C3.09998 14.1696 3.50292 13.7666 3.99998 13.7666Z" fill="currentColor"/>
-            </svg>
-            Загрузить файл
-        </button>
-        <button class="tab" onclick="switchTab('url')" id="tab-url">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M3.97427 8.06961C4.99348 7.33581 6.18946 7.1 7.00001 7.1H9.00001C9.49706 7.1 9.90001 7.50294 9.90001 8C9.90001 8.49706 9.49706 8.9 9.00001 8.9H7.00001C6.47755 8.9 5.67353 9.06419 5.02599 9.53039C4.42434 9.96356 3.90001 10.6934 3.90001 12C3.90001 13.3066 4.42434 14.0364 5.02599 14.4696C5.67353 14.9358 6.47755 15.1 7.00001 15.1H9.00001C9.49706 15.1 9.90001 15.5029 9.90001 16C9.90001 16.4971 9.49706 16.9 9.00001 16.9H7.00001C6.18946 16.9 4.99348 16.6642 3.97427 15.9304C2.90917 15.1636 2.10001 13.8934 2.10001 12C2.10001 10.1066 2.90917 8.83644 3.97427 8.06961ZM14.1 8C14.1 7.50294 14.5029 7.1 15 7.1H17C17.8105 7.1 19.0065 7.33581 20.0257 8.06961C21.0908 8.83644 21.9 10.1066 21.9 12C21.9 13.8934 21.0908 15.1636 20.0257 15.9304C19.0065 16.6642 17.8105 16.9 17 16.9H15C14.5029 16.9 14.1 16.4971 14.1 16C14.1 15.5029 14.5029 15.1 15 15.1H17C17.5225 15.1 18.3265 14.9358 18.974 14.4696C19.5757 14.0364 20.1 13.3066 20.1 12C20.1 10.6934 19.5757 9.96356 18.974 9.53039C18.3265 9.06419 17.5225 8.9 17 8.9H15C14.5029 8.9 14.1 8.49706 14.1 8ZM7.10001 12C7.10001 11.5029 7.50295 11.1 8.00001 11.1H16C16.4971 11.1 16.9 11.5029 16.9 12C16.9 12.4971 16.4971 12.9 16 12.9H8.00001C7.50295 12.9 7.10001 12.4971 7.10001 12Z" fill="currentColor"/>
-            </svg>
-            Ссылка
-        </button>
-    </div>
-
     <div class="panel" id="panel-input">
-        <div id="file-panel">
-            <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
-                <input type="file" id="file-input" accept="audio/*" onchange="handleFile(this.files[0])">
-                <div class="dropzone-icon">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M11.3636 3.36358C11.7151 3.01211 12.2849 3.01211 12.6364 3.36358L17.0808 7.80802C17.4323 8.1595 17.4323 8.72934 17.0808 9.08082C16.7293 9.43229 16.1595 9.43229 15.808 9.08082L12.9 6.17277V14.6666C12.9 15.1637 12.497 15.5666 12 15.5666C11.5029 15.5666 11.1 15.1637 11.1 14.6666V6.17277L8.19193 9.08082C7.84046 9.43229 7.27061 9.43229 6.91914 9.08082C6.56766 8.72934 6.56766 8.1595 6.91914 7.80802L11.3636 3.36358ZM3.99998 13.7666C4.49703 13.7666 4.89998 14.1696 4.89998 14.6666V18.2222C4.89998 18.455 4.99246 18.6783 5.15707 18.8429C5.32169 19.0075 5.54495 19.1 5.77775 19.1H18.2222C18.455 19.1 18.6783 19.0075 18.8429 18.8429C19.0075 18.6783 19.1 18.455 19.1 18.2222V14.6666C19.1 14.1696 19.5029 13.7666 20 13.7666C20.497 13.7666 20.9 14.1696 20.9 14.6666V18.2222C20.9 18.9324 20.6179 19.6135 20.1157 20.1157C19.6135 20.6179 18.9324 20.9 18.2222 20.9H5.77775C5.06756 20.9 4.38646 20.6179 3.88428 20.1157C3.3821 19.6135 3.09998 18.9324 3.09998 18.2222V14.6666C3.09998 14.1696 3.50292 13.7666 3.99998 13.7666Z" fill="currentColor"/>
-                    </svg>
-                </div>
-                <h3>Перетащите аудиофайл сюда</h3>
-                <p>MP3, WAV, FLAC, M4A до 50 МБ</p>
-            </div>
-            <div id="file-selected" class="file-selected hidden">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M15.4795 15.4971C15.9765 15.4971 16.3799 15.9004 16.3799 16.3975C16.3799 16.8945 15.9765 17.2978 15.4795 17.2979H8.52051C8.02345 17.2979 7.62012 16.8945 7.62012 16.3975C7.62012 15.9004 8.02345 15.4971 8.52051 15.4971H15.4795Z" fill="currentColor"/>
-                    <path d="M12.3359 11.0996C12.8329 11.0997 13.2354 11.503 13.2354 12C13.2354 12.497 12.8329 12.9003 12.3359 12.9004H8.52051C8.02345 12.9004 7.62012 12.497 7.62012 12C7.62012 11.503 8.02345 11.0996 8.52051 11.0996H12.3359Z" fill="currentColor"/>
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M4 4.5C4 3.67157 4.67157 3 5.5 3H14.2929C14.5669 3 14.8284 3.10896 15.0206 3.30117L19.6988 7.97937C19.891 8.17157 20 8.43309 20 8.70711V19.5C20 20.3284 19.3284 21 18.5 21H5.5C4.67157 21 4 20.3284 4 19.5V4.5ZM18.5 19.1H5.5C5.72091 19.1 5.9 18.9209 5.9 18.7V5.3C5.9 5.07909 6.07909 4.9 6.3 4.9H13.1V8.20711C13.1 8.92718 13.6838 9.51102 14.4039 9.51102H18.1V18.7C18.1 18.9209 18.2791 19.1 18.5 19.1ZM15.1 5.9034V7.61102H16.8076L15.1 5.9034Z" fill="currentColor"/>
-                </svg>
-                <div class="file-info">
-                    <div class="file-name" id="file-name">song.mp3</div>
-                    <div class="file-size" id="file-size">4.2 МБ</div>
-                </div>
-                <button onclick="clearFile(event)" style="background:none;border:none;color:var(--text-tertiary);cursor:pointer;padding:4px;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M18.3004 5.70996C17.9104 5.31996 17.2804 5.31996 16.8904 5.70996L12.0004 10.59L7.11039 5.69996C6.72039 5.30996 6.09039 5.30996 5.70039 5.69996C5.31039 6.08996 5.31039 6.71996 5.70039 7.10996L10.5904 12L5.70039 16.89C5.31039 17.28 5.31039 17.91 5.70039 18.3C6.09039 18.69 6.72039 18.69 7.11039 18.3L12.0004 13.41L16.8904 18.3C17.2804 18.69 17.9104 18.69 18.3004 18.3C18.6904 17.91 18.6904 17.28 18.3004 16.89L13.4104 12L18.3004 7.10996C18.6804 6.72996 18.6804 6.08996 18.3004 5.70996Z" fill="currentColor"/>
-                    </svg>
-                </button>
-            </div>
+        <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
+            <input type="file" id="file-input" accept="audio/*" onchange="handleFile(this.files[0])">
+            <h3>Перетащите аудиофайл сюда</h3>
+            <p>MP3, WAV, FLAC, M4A до 50 МБ</p>
         </div>
-
-        <div id="url-panel" class="hidden">
-            <input type="text" class="url-input" id="url-input" placeholder="https://youtube.com/watch?v=... или ссылка на аудио">
+        <div id="file-selected" class="file-selected hidden">
+            <div class="file-info">
+                <div class="file-name" id="file-name">song.mp3</div>
+                <div class="file-size" id="file-size">4.2 МБ</div>
+            </div>
+            <button onclick="clearFile(event)" style="background:none;border:none;color:var(--text-tertiary);cursor:pointer;">✕</button>
         </div>
-
-        <button class="btn-primary" id="transcribe-btn" onclick="startTranscription()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M7.76253 3.10547C8.25778 3.10552 8.74424 3.23849 9.17073 3.49023L19.533 9.60742C20.8536 10.3869 21.2923 12.0901 20.5174 13.4121C20.2785 13.8195 19.9398 14.1604 19.533 14.4004L9.16975 20.5156C7.84722 21.2958 6.14596 20.8511 5.36995 19.5273C5.11962 19.1003 4.9872 18.6142 4.98714 18.1191V5.88672C4.98717 4.3537 6.22731 3.10547 7.76253 3.10547ZM6.78792 18.1191C6.78798 18.2945 6.83431 18.4664 6.92268 18.6172C7.19639 19.0841 7.79338 19.2377 8.25569 18.9648L18.618 12.8496C18.7607 12.7654 18.8803 12.6458 18.9647 12.502C19.2393 12.0334 19.082 11.4311 18.618 11.1572L8.25569 5.04102C8.10612 4.95273 7.93564 4.9063 7.76253 4.90625C7.22705 4.90625 6.78795 5.34218 6.78792 5.88672V18.1191Z" fill="currentColor"/>
-            </svg>
-            Транскрибировать в ноты
-        </button>
+        <button class="btn-primary" id="transcribe-btn" onclick="startTranscription()">🎵 Транскрибировать в ноты</button>
     </div>
 
     <div class="panel hidden" id="panel-processing">
         <div class="processing">
-            <div class="spinner"><div class="spinner-ring"></div></div>
+            <div class="spinner"></div>
             <h3 style="font-size: 17px; font-weight: 500; margin-bottom: 8px;">Обработка аудио...</h3>
-            <p style="font-size: 14px; color: var(--text-secondary);" id="status-text">Загрузка файла</p>
-
-            <div class="steps">
-                <div class="step active" id="step-1">
-                    <div class="step-icon">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M11.3636 3.36358C11.7151 3.01211 12.2849 3.01211 12.6364 3.36358L17.0808 7.80802C17.4323 8.1595 17.4323 8.72934 17.0808 9.08082C16.7293 9.43229 16.1595 9.43229 15.808 9.08082L12.9 6.17277V14.6666C12.9 15.1637 12.497 15.5666 12 15.5666C11.5029 15.5666 11.1 15.1637 11.1 14.6666V6.17277L8.19193 9.08082C7.84046 9.43229 7.27061 9.43229 6.91914 9.08082C6.56766 8.72934 6.56766 8.1595 6.91914 7.80802L11.3636 3.36358ZM3.99998 13.7666C4.49703 13.7666 4.89998 14.1696 4.89998 14.6666V18.2222C4.89998 18.455 4.99246 18.6783 5.15707 18.8429C5.32169 19.0075 5.54495 19.1 5.77775 19.1H18.2222C18.455 19.1 18.6783 19.0075 18.8429 18.8429C19.0075 18.6783 19.1 18.455 19.1 18.2222V14.6666C19.1 14.1696 19.5029 13.7666 20 13.7666C20.497 13.7666 20.9 14.1696 20.9 14.6666V18.2222C20.9 18.9324 20.6179 19.6135 20.1157 20.1157C19.6135 20.6179 18.9324 20.9 18.2222 20.9H5.77775C5.06756 20.9 4.38646 20.6179 3.88428 20.1157C3.3821 19.6135 3.09998 18.9324 3.09998 18.2222V14.6666C3.09998 14.1696 3.50292 13.7666 3.99998 13.7666Z" fill="currentColor"/>
-                        </svg>
-                    </div>
-                    <span class="step-label">Загрузка</span>
-                </div>
-                <div class="step" id="step-2">
-                    <div class="step-icon">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M17.6508 6.34921C17.276 5.97444 16.6704 5.97444 16.2956 6.34921C15.9208 6.72399 15.9208 7.32959 16.2956 7.70437C18.5754 9.98415 18.5754 13.6825 16.2956 15.9623C15.9208 16.3371 15.9208 16.9427 16.2956 17.3174C16.6704 17.6922 17.276 17.6922 17.6508 17.3174C20.7831 14.1852 20.7831 9.48147 17.6508 6.34921ZM6.34921 6.34921C9.48147 3.21695 14.1852 3.21695 17.3174 6.34921C17.6922 6.72399 17.6922 7.32959 17.3174 7.70437C16.9427 8.07915 16.3371 8.07915 15.9623 7.70437C13.6825 5.42459 9.98415 5.42459 7.70437 7.70437C7.32959 8.07915 6.72399 8.07915 6.34921 7.70437C5.97444 7.32959 5.97444 6.72399 6.34921 6.34921ZM19.0698 3.93023C19.4446 4.30501 19.4446 4.91061 19.0698 5.28539C18.695 5.66016 18.0894 5.66016 17.7146 5.28539C14.8753 2.4461 10.7913 2.4461 7.95207 5.28539C7.57729 5.66016 6.97169 5.66016 6.59691 5.28539C6.22214 4.91061 6.22214 4.30501 6.59691 3.93023C10.2341 0.292922 16.4326 0.292922 19.0698 3.93023ZM14.5714 12C14.5714 13.4203 13.4203 14.5714 12 14.5714C10.5797 14.5714 9.42857 13.4203 9.42857 12C9.42857 10.5797 10.5797 9.42857 12 9.42857C13.4203 9.42857 14.5714 10.5797 14.5714 12ZM12 16.7619C14.6308 16.7619 16.7619 14.6308 16.7619 12C16.7619 9.36924 14.6308 7.2381 12 7.2381C9.36924 7.2381 7.2381 9.36924 7.2381 12C7.2381 14.6308 9.36924 16.7619 12 16.7619ZM5.28539 17.7146C5.66016 18.0894 5.66016 18.695 5.28539 19.0698C4.91061 19.4446 4.30501 19.4446 3.93023 19.0698C0.292922 16.4326 0.292922 10.2341 3.93023 6.59691C4.30501 6.22214 4.91061 6.22214 5.28539 6.59691C5.66016 6.97169 5.66016 7.57729 5.28539 7.95207C2.4461 10.7913 2.4461 14.8753 5.28539 17.7146ZM7.70437 16.2956C8.07915 15.9208 8.68475 15.9208 9.05953 16.2956C9.43431 16.6704 9.43431 17.276 9.05953 17.6508C6.77975 19.9305 3.08141 19.9305 0.801631 17.6508C0.426854 17.276 0.426854 16.6704 0.801631 16.2956C1.17641 15.9208 1.78201 15.9208 2.15679 16.2956C4.43657 18.5754 8.13491 18.5754 10.4147 16.2956C10.7895 15.9208 11.3951 15.9208 11.7698 16.2956C12.1446 16.6704 12.1446 17.276 11.7698 17.6508C9.48905 19.9305 5.79071 19.9305 3.51093 17.6508C3.13615 17.276 3.13615 16.6704 3.51093 16.2956C3.88571 15.9208 4.49131 15.9208 4.86609 16.2956C7.02523 18.4547 10.5464 18.4547 12.7055 16.2956C13.0803 15.9208 13.6859 15.9208 14.0607 16.2956C14.4355 16.6704 14.4355 17.276 14.0607 17.6508C11.781 19.9305 8.08262 19.9305 5.80284 17.6508C5.42806 17.276 5.42806 16.6704 5.80284 16.2956C6.17762 15.9208 6.78322 15.9208 7.158 16.2956C9.31714 18.4547 12.8383 18.4547 14.9974 16.2956C15.3722 15.9208 15.9778 15.9208 16.3526 16.2956C16.7273 16.6704 16.7273 17.276 16.3526 17.6508C14.0728 19.9305 10.3744 19.9305 8.09465 17.6508C7.71987 17.276 7.71987 16.6704 8.09465 16.2956C8.46943 15.9208 9.07503 15.9208 9.44981 16.2956Z" fill="currentColor"/>
-                        </svg>
-                    </div>
-                    <span class="step-label">Анализ</span>
-                </div>
-                <div class="step" id="step-3">
-                    <div class="step-icon">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M15.4795 15.4971C15.9765 15.4971 16.3799 15.9004 16.3799 16.3975C16.3799 16.8945 15.9765 17.2978 15.4795 17.2979H8.52051C8.02345 17.2979 7.62012 16.8945 7.62012 16.3975C7.62012 15.9004 8.02345 15.4971 8.52051 15.4971H15.4795Z" fill="currentColor"/>
-                            <path d="M12.3359 11.0996C12.8329 11.0997 13.2354 11.503 13.2354 12C13.2354 12.497 12.8329 12.9003 12.3359 12.9004H8.52051C8.02345 12.9004 7.62012 12.497 7.62012 12C7.62012 11.503 8.02345 11.0996 8.52051 11.0996H12.3359Z" fill="currentColor"/>
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M4 4.5C4 3.67157 4.67157 3 5.5 3H14.2929C14.5669 3 14.8284 3.10896 15.0206 3.30117L19.6988 7.97937C19.891 8.17157 20 8.43309 20 8.70711V19.5C20 20.3284 19.3284 21 18.5 21H5.5C4.67157 21 4 20.3284 4 19.5V4.5ZM18.5 19.1H5.5C5.72091 19.1 5.9 18.9209 5.9 18.7V5.3C5.9 5.07909 6.07909 4.9 6.3 4.9H13.1V8.20711C13.1 8.92718 13.6838 9.51102 14.4039 9.51102H18.1V18.7C18.1 18.9209 18.2791 19.1 18.5 19.1ZM15.1 5.9034V7.61102H16.8076L15.1 5.9034Z" fill="currentColor"/>
-                        </svg>
-                    </div>
-                    <span class="step-label">Ноты</span>
-                </div>
-            </div>
+            <p class="status-text" id="status-text">Загрузка файла</p>
         </div>
     </div>
 
     <div class="panel hidden fade-in" id="panel-result">
         <div class="result">
-            <div class="result-badge" id="result-badge">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M19.3027 5.9053C19.6542 5.55397 20.2247 5.55388 20.5761 5.9053C20.9273 6.25675 20.9273 6.82734 20.5761 7.17874L9.65911 18.0948C9.30773 18.4461 8.73814 18.446 8.38665 18.0948L3.42376 13.1328C3.0726 12.7814 3.07263 12.2118 3.42376 11.8604C3.77524 11.509 4.34575 11.5089 4.6972 11.8604L9.02239 16.1856L19.3027 5.9053Z" fill="currentColor"/>
-                </svg>
-                Готово! Ноты сгенерированы
-            </div>
-
-            <div class="sheet-preview">
-                <div class="sheet-title" id="sheet-title">Transcription — Piano Solo</div>
-                <div class="staff">
-                    <div class="staff-line" style="top: 0;"></div>
-                    <div class="staff-line" style="top: 16px;"></div>
-                    <div class="staff-line" style="top: 32px;"></div>
-                    <div class="staff-line" style="top: 48px;"></div>
-                    <div class="staff-line" style="top: 64px;"></div>
-                    <div class="note" style="left: 40px; top: 48px;"></div>
-                    <div class="note" style="left: 90px; top: 32px;"></div>
-                    <div class="note" style="left: 140px; top: 24px;"></div>
-                    <div class="note" style="left: 190px; top: 40px;"></div>
-                    <div class="note" style="left: 240px; top: 16px;"></div>
-                    <div class="note" style="left: 290px; top: 48px;"></div>
-                    <div class="note" style="left: 340px; top: 32px;"></div>
-                    <div class="note" style="left: 390px; top: 8px;"></div>
-                </div>
-                <div class="staff">
-                    <div class="staff-line" style="top: 0;"></div>
-                    <div class="staff-line" style="top: 16px;"></div>
-                    <div class="staff-line" style="top: 32px;"></div>
-                    <div class="staff-line" style="top: 48px;"></div>
-                    <div class="staff-line" style="top: 64px;"></div>
-                    <div class="note" style="left: 60px; top: 40px;"></div>
-                    <div class="note" style="left: 110px; top: 56px;"></div>
-                    <div class="note" style="left: 160px; top: 24px;"></div>
-                    <div class="note" style="left: 210px; top: 48px;"></div>
-                    <div class="note" style="left: 260px; top: 16px;"></div>
-                    <div class="note" style="left: 310px; top: 40px;"></div>
-                    <div class="note" style="left: 360px; top: 32px;"></div>
-                </div>
-                <div style="text-align: center; color: #999; font-size: 12px; margin-top: 16px; font-family: sans-serif;">— 1 / 3 —</div>
-            </div>
-
+            <div class="result-badge">✅ Готово! Ноты сгенерированы</div>
             <div class="actions">
-                <button class="btn btn-secondary" onclick="resetApp()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 5V1L7 6L12 11V7C15.31 7 18 9.69 18 13C18 16.31 15.31 19 12 19C8.69 19 6 16.31 6 13H4C4 17.42 7.58 21 12 21C16.42 21 20 17.42 20 13C20 8.58 16.42 5 12 5Z" fill="currentColor"/>
-                    </svg>
-                    Новая песня
-                </button>
-                <a class="btn btn-accent" id="download-btn" href="#" target="_blank">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2.90002C12.4971 2.90002 12.9 3.30297 12.9 3.80002V12.2939L15.8081 9.38585C16.1595 9.03438 16.7294 9.03438 17.0808 9.38585C17.4323 9.73732 17.4323 10.3072 17.0808 10.6586L12.6364 15.1031C12.4676 15.2719 12.2387 15.3667 12 15.3667C11.7613 15.3667 11.5324 15.2719 11.3636 15.1031L6.91917 10.6586C6.5677 10.3072 6.5677 9.73732 6.91917 9.38585C7.27064 9.03438 7.84049 9.03438 8.19196 9.38585L11.1 12.2939V3.80002C11.1 3.30297 11.503 2.90002 12 2.90002ZM4.00001 13.5874C4.49706 13.5874 4.90001 13.9903 4.90001 14.4874V18.043C4.90001 18.2758 4.99249 18.499 5.1571 18.6636C5.32172 18.8282 5.54498 18.9207 5.77778 18.9207H18.2222C18.455 18.9207 18.6783 18.8283 18.8429 18.6636C19.0075 18.499 19.1 18.2758 19.1 18.043V14.4874C19.1 13.9903 19.5029 13.5874 20 13.5874C20.4971 13.5874 20.9 13.9903 20.9 14.4874V18.043C20.9 18.7531 20.6179 19.4342 20.1157 19.9364C19.6135 20.4386 18.9324 20.7207 18.2222 20.7207H5.77778C5.06759 20.7207 4.38649 20.4386 3.88431 19.9364C3.38213 19.4342 3.10001 18.7531 3.10001 18.043V14.4874C3.10001 13.9903 3.50295 13.5874 4.00001 13.5874Z" fill="currentColor"/>
-                    </svg>
-                    Скачать PDF
-                </a>
+                <button class="btn btn-secondary" onclick="resetApp()">🔄 Новая песня</button>
+                <a class="btn btn-accent" id="download-btn" href="#" target="_blank">⬇️ Скачать PDF</a>
             </div>
         </div>
     </div>
 
     <div class="panel hidden fade-in" id="panel-error">
         <div class="result">
-            <div class="error-badge">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="currentColor"/>
-                </svg>
-                <span id="error-text">Произошла ошибка</span>
-            </div>
-            <button class="btn btn-secondary" onclick="resetApp()" style="max-width: 200px; margin: 0 auto;">
-                Попробовать снова
-            </button>
+            <div class="error-badge">❌ <span id="error-text">Ошибка</span></div>
+            <button class="btn btn-secondary" onclick="resetApp()" style="max-width: 200px; margin: 0 auto;">Попробовать снова</button>
         </div>
     </div>
 </div>
@@ -532,15 +103,7 @@
 <script>
 const API_URL = "https://pianomagic.onrender.com";
 let currentFile = null;
-let activeTab = 'file';
-
-function switchTab(tab) {
-    activeTab = tab;
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('tab-' + tab).classList.add('active');
-    document.getElementById('file-panel').classList.toggle('hidden', tab !== 'file');
-    document.getElementById('url-panel').classList.toggle('hidden', tab !== 'url');
-}
+let pollInterval = null;
 
 function handleFile(file) {
     if (!file) return;
@@ -569,81 +132,66 @@ dropzone.addEventListener('drop', (e) => {
     if (file && file.type.startsWith('audio/')) handleFile(file);
 });
 
-function setStep(n) {
-    for (let i = 1; i <= 3; i++) {
-        const el = document.getElementById('step-' + i);
-        el.classList.remove('active', 'done');
-        if (i < n) el.classList.add('done');
-        if (i === n) el.classList.add('active');
-    }
-}
-
-function setStatus(text) {
-    document.getElementById('status-text').textContent = text;
-}
-
 async function startTranscription() {
-    if (activeTab === 'file' && !currentFile) {
-        alert('Выберите аудиофайл');
-        return;
-    }
-    if (activeTab === 'url') {
-        alert('Загрузка по ссылке пока недоступна. Используйте файл.');
-        return;
-    }
+    if (!currentFile) { alert('Выберите аудиофайл'); return; }
 
     document.getElementById('panel-input').classList.add('hidden');
     document.getElementById('panel-processing').classList.remove('hidden');
     document.getElementById('panel-result').classList.add('hidden');
     document.getElementById('panel-error').classList.add('hidden');
-
-    setStep(1);
-    setStatus('Загрузка файла...');
+    document.getElementById('status-text').textContent = 'Загрузка файла...';
 
     try {
+        // Шаг 1: Загружаем файл
         const formData = new FormData();
         formData.append("file", currentFile);
 
-        setStep(2);
-        setStatus('AI анализирует аудио...');
-
-        const response = await fetch(`${API_URL}/transcribe/file`, {
+        const uploadRes = await fetch(`${API_URL}/transcribe/file`, {
             method: "POST",
             body: formData
         });
 
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.detail || `Ошибка сервера: ${response.status}`);
+        if (!uploadRes.ok) {
+            const err = await uploadRes.json().catch(() => ({}));
+            throw new Error(err.detail || `Ошибка загрузки: ${uploadRes.status}`);
         }
 
-        const data = await response.json();
+        const { job_id } = await uploadRes.json();
+        document.getElementById('status-text').textContent = 'AI анализирует аудио...';
 
-        setStep(3);
-        setStatus('Генерация нот...');
+        // Шаг 2: Polling статуса каждые 3 секунды
+        pollInterval = setInterval(async () => {
+            try {
+                const statusRes = await fetch(`${API_URL}/jobs/${job_id}`);
+                if (!statusRes.ok) return;
 
-        setTimeout(() => showResult(data), 800);
+                const data = await statusRes.json();
+                document.getElementById('status-text').textContent = data.message || 'Обработка...';
+
+                if (data.status === 'completed') {
+                    clearInterval(pollInterval);
+                    showResult(data);
+                } else if (data.status === 'error') {
+                    clearInterval(pollInterval);
+                    showError(data.message || 'Ошибка обработки');
+                }
+            } catch (e) {
+                console.log('Polling error', e);
+            }
+        }, 3000);
 
     } catch (err) {
         console.error(err);
-        showError(err.message || 'Не удалось обработать файл');
+        showError(err.message || 'Не удалось загрузить файл');
     }
 }
 
 function showResult(data) {
     document.getElementById('panel-processing').classList.add('hidden');
     document.getElementById('panel-result').classList.remove('hidden');
-
-    const name = currentFile ? currentFile.name.replace(/\.[^.]+$/, '') : 'Transcription';
-    document.getElementById('sheet-title').textContent = name + ' — Piano Solo';
-
-    // Устанавливаем ссылку на скачивание
     const downloadBtn = document.getElementById('download-btn');
     if (data.pdf_url) {
         downloadBtn.href = `${API_URL}${data.pdf_url}`;
-        downloadBtn.classList.remove('hidden');
-    } else {
-        downloadBtn.classList.add('hidden');
     }
 }
 
@@ -654,21 +202,15 @@ function showError(message) {
 }
 
 function resetApp() {
+    if (pollInterval) clearInterval(pollInterval);
     currentFile = null;
     document.getElementById('file-input').value = '';
-    document.getElementById('url-input').value = '';
     document.getElementById('file-selected').classList.add('hidden');
     document.getElementById('dropzone').classList.remove('hidden');
     document.getElementById('panel-result').classList.add('hidden');
     document.getElementById('panel-error').classList.add('hidden');
     document.getElementById('panel-input').classList.remove('hidden');
-    for (let i = 1; i <= 3; i++) {
-        document.getElementById('step-' + i).classList.remove('active', 'done');
-    }
-    document.getElementById('step-1').classList.add('active');
-    setStatus('Загрузка файла');
 }
 </script>
-
 </body>
 </html>
