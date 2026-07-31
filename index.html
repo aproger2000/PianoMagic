@@ -2,215 +2,183 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PianoMagic — Аудио в ноты</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PianoMagic</title>
     <style>
-        :root {
-            --bg: #0f0f0f; --surface: #1a1a1a; --surface-raised: #222;
-            --border: #333; --text-primary: #f0f0f0; --text-secondary: #888;
-            --text-tertiary: #555; --accent: #4f8ef7; --positive: #4caf50;
-            --danger: #f44336; --radius: 12px; --radius-sm: 8px;
-            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 16px;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: var(--font); background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 40px 20px; }
-        .app { width: 100%; max-width: 640px; }
-        .header { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
-        .header-icon { width: 40px; height: 40px; background: var(--surface-raised); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
-        .header h1 { font-size: 20px; font-weight: 500; }
-        .header p { font-size: 14px; color: var(--text-secondary); margin-top: 2px; }
-        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
-        .dropzone { border: 2px dashed var(--border); border-radius: var(--radius-sm); padding: 48px 24px; text-align: center; cursor: pointer; transition: all 0.2s; }
-        .dropzone:hover, .dropzone.dragover { border-color: var(--text-tertiary); background: rgba(255,255,255,0.02); }
-        .dropzone input { display: none; }
-        .dropzone h3 { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
-        .dropzone p { font-size: 13px; color: var(--text-tertiary); }
-        .file-selected { display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 12px; background: var(--surface-raised); border-radius: var(--radius-sm); border: 1px solid var(--border); }
-        .file-info { flex: 1; min-width: 0; }
-        .file-name { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .file-size { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; }
-        .btn-primary { width: 100%; margin-top: 20px; padding: 14px; background: var(--text-primary); color: var(--bg); border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 500; font-family: inherit; cursor: pointer; transition: opacity 0.2s; }
-        .btn-primary:hover { opacity: 0.9; }
-        .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-        .processing { text-align: center; padding: 40px 20px; }
-        .spinner { width: 48px; height: 48px; margin: 0 auto 20px; border: 3px solid var(--border); border-top-color: var(--text-primary); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .status-text { font-size: 14px; color: var(--text-secondary); margin-top: 12px; }
-        .result { text-align: center; }
-        .result-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(76,175,80,0.12); border: 1px solid rgba(76,175,80,0.3); border-radius: 100px; color: var(--positive); font-size: 14px; font-weight: 500; margin-bottom: 24px; }
-        .error-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(244,67,54,0.12); border: 1px solid rgba(244,67,54,0.3); border-radius: 100px; color: var(--danger); font-size: 14px; font-weight: 500; margin-bottom: 24px; }
-        .actions { display: flex; gap: 12px; }
-        .btn { flex: 1; padding: 12px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--border); text-decoration: none; }
-        .btn-secondary { background: var(--surface-raised); color: var(--text-primary); }
-        .btn-accent { background: var(--text-primary); color: var(--bg); border-color: var(--text-primary); }
-        .hidden { display: none !important; }
-        .fade-in { animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        h1 { margin-top: 40px; font-size: 2rem; letter-spacing: -0.5px; }
+        .subtitle { color: #a0a0c0; margin: 8px 0 32px; font-size: 0.95rem; }
+        .drop-zone {
+            width: 100%;
+            max-width: 480px;
+            height: 180px;
+            border: 2px dashed #00d4aa;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: rgba(0, 212, 170, 0.06);
+        }
+        .drop-zone:active, .drop-zone.dragover {
+            background: rgba(0, 212, 170, 0.18);
+            transform: scale(0.98);
+        }
+        .drop-zone input { display: none; }
+        .icon { font-size: 2.8rem; margin-bottom: 8px; filter: grayscale(0.2); }
+        .hint { font-size: 0.85rem; color: #8080a0; margin-top: 6px; }
+        .status {
+            margin-top: 28px;
+            padding: 20px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.06);
+            max-width: 480px;
+            width: 100%;
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+        .status.active { display: block; }
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 14px;
+        }
+        .progress-bar .fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4aa, #00a8e8);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #00d4aa, #00a8e8);
+            color: #0f0c29;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+        }
+        .error { color: #ff6b8a; }
+        .success { color: #00d4aa; }
     </style>
 </head>
 <body>
-<div class="app">
-    <div class="header">
-        <div class="header-icon">🎹</div>
-        <div>
-            <h1>PianoMagic</h1>
-            <p>Аудио в ноты за несколько секунд</p>
-        </div>
+    <h1>🎹 PianoMagic</h1>
+    <p class="subtitle">Аудио → Ноты (PDF)</p>
+
+    <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" accept="audio/*">
+        <div class="icon">📁</div>
+        <div>Перетащите аудиофайл сюда</div>
+        <div class="hint">MP3 · WAV · FLAC · M4A · OGG</div>
     </div>
 
-    <div class="panel" id="panel-input">
-        <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
-            <input type="file" id="file-input" accept="audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/flac,.mp3,.wav,.m4a,.flac,.ogg,.aac" onchange="handleFile(this.files[0])">
-            <h3>Перетащите аудиофайл сюда</h3>
-            <p>MP3, WAV, FLAC, M4A до 50 МБ</p>
+    <div class="status" id="status">
+        <div id="statusText">Загрузка...</div>
+        <div class="progress-bar" id="progressBar" style="display:none;">
+            <div class="fill" id="progressFill"></div>
         </div>
-        <div id="file-selected" class="file-selected hidden">
-            <div class="file-info">
-                <div class="file-name" id="file-name">song.mp3</div>
-                <div class="file-size" id="file-size">4.2 МБ</div>
-            </div>
-            <button onclick="clearFile(event)" style="background:none;border:none;color:var(--text-tertiary);cursor:pointer;">✕</button>
-        </div>
-        <button class="btn-primary" id="transcribe-btn" onclick="startTranscription()">🎵 Транскрибировать в ноты</button>
+        <div id="actions"></div>
     </div>
 
-    <div class="panel hidden" id="panel-processing">
-        <div class="processing">
-            <div class="spinner"></div>
-            <h3 style="font-size: 17px; font-weight: 500; margin-bottom: 8px;">Обработка аудио...</h3>
-            <p class="status-text" id="status-text">Загрузка файла</p>
-        </div>
-    </div>
+    <script>
+        const API_URL = 'https://pianomagic-api.onrender.com';
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const status = document.getElementById('status');
+        const statusText = document.getElementById('statusText');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const actions = document.getElementById('actions');
+        let pollInterval;
 
-    <div class="panel hidden fade-in" id="panel-result">
-        <div class="result">
-            <div class="result-badge">✅ Готово! Ноты сгенерированы</div>
-            <div class="actions">
-                <button class="btn btn-secondary" onclick="resetApp()">🔄 Новая песня</button>
-                <a class="btn btn-accent" id="download-btn" href="#" target="_blank">⬇️ Скачать PDF</a>
-            </div>
-        </div>
-    </div>
+        dropZone.addEventListener('click', () => fileInput.click());
 
-    <div class="panel hidden fade-in" id="panel-error">
-        <div class="result">
-            <div class="error-badge">❌ <span id="error-text">Ошибка</span></div>
-            <button class="btn btn-secondary" onclick="resetApp()" style="max-width: 200px; margin: 0 auto;">Попробовать снова</button>
-        </div>
-    </div>
-</div>
-
-<script>
-const API_URL = "https://pianomagic-api.onrender.com";
-let currentFile = null;
-let pollInterval = null;
-
-function handleFile(file) {
-    if (!file) return;
-    currentFile = file;
-    document.getElementById('file-name').textContent = file.name;
-    document.getElementById('file-size').textContent = (file.size / 1024 / 1024).toFixed(1) + ' МБ';
-    document.getElementById('file-selected').classList.remove('hidden');
-    document.getElementById('dropzone').classList.add('hidden');
-}
-
-function clearFile(e) {
-    e.stopPropagation();
-    currentFile = null;
-    document.getElementById('file-input').value = '';
-    document.getElementById('file-selected').classList.add('hidden');
-    document.getElementById('dropzone').classList.remove('hidden');
-}
-
-const dropzone = document.getElementById('dropzone');
-dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
-dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
-dropzone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropzone.classList.remove('dragover');
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('audio/')) handleFile(file);
-});
-
-async function startTranscription() {
-    if (!currentFile) { alert('Выберите аудиофайл'); return; }
-
-    document.getElementById('panel-input').classList.add('hidden');
-    document.getElementById('panel-processing').classList.remove('hidden');
-    document.getElementById('panel-result').classList.add('hidden');
-    document.getElementById('panel-error').classList.add('hidden');
-    document.getElementById('status-text').textContent = 'Загрузка файла...';
-
-    try {
-        // Шаг 1: Загружаем файл
-        const formData = new FormData();
-        formData.append("file", currentFile);
-
-        const uploadRes = await fetch(`${API_URL}/transcribe/file`, {
-            method: "POST",
-            body: formData
+        ['dragover','dragenter'].forEach(evt => {
+            dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        });
+        ['dragleave','drop'].forEach(evt => {
+            dropZone.addEventListener(evt, e => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                if (evt === 'drop' && e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+            });
         });
 
-        if (!uploadRes.ok) {
-            const err = await uploadRes.json().catch(() => ({}));
-            throw new Error(err.detail || `Ошибка загрузки: ${uploadRes.status}`);
+        fileInput.addEventListener('change', e => {
+            if (e.target.files.length) handleFile(e.target.files[0]);
+        });
+
+        function handleFile(file) {
+            const valid = /\.(mp3|wav|flac|m4a|ogg)$/i.test(file.name) || file.type.startsWith('audio/');
+            if (!valid) { alert('Выберите аудиофайл (MP3, WAV, FLAC, M4A, OGG)'); return; }
+
+            status.classList.add('active');
+            statusText.textContent = 'Загрузка на сервер...';
+            progressBar.style.display = 'block';
+            progressFill.style.width = '25%';
+            actions.innerHTML = '';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch(`${API_URL}/transcribe/file`, { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.job_id) {
+                        statusText.textContent = 'ИИ транскрибирует ноты...';
+                        progressFill.style.width = '50%';
+                        pollStatus(data.job_id);
+                    } else throw new Error('Сервер не вернул job_id');
+                })
+                .catch(err => {
+                    statusText.innerHTML = `<span class="error">Ошибка: ${err.message}</span>`;
+                    progressBar.style.display = 'none';
+                });
         }
 
-        const { job_id } = await uploadRes.json();
-        document.getElementById('status-text').textContent = 'AI анализирует аудио...';
-
-        // Шаг 2: Polling статуса каждые 3 секунды
-        pollInterval = setInterval(async () => {
-            try {
-                const statusRes = await fetch(`${API_URL}/jobs/${job_id}`);
-                if (!statusRes.ok) return;
-
-                const data = await statusRes.json();
-                document.getElementById('status-text').textContent = data.message || 'Обработка...';
-
-                if (data.status === 'completed') {
-                    clearInterval(pollInterval);
-                    showResult(data);
-                } else if (data.status === 'error') {
-                    clearInterval(pollInterval);
-                    showError(data.message || 'Ошибка обработки');
-                }
-            } catch (e) {
-                console.log('Polling error', e);
-            }
-        }, 3000);
-
-    } catch (err) {
-        console.error(err);
-        showError(err.message || 'Не удалось загрузить файл');
-    }
-}
-
-function showResult(data) {
-    document.getElementById('panel-processing').classList.add('hidden');
-    document.getElementById('panel-result').classList.remove('hidden');
-    const downloadBtn = document.getElementById('download-btn');
-    if (data.pdf_url) {
-        downloadBtn.href = `${API_URL}${data.pdf_url}`;
-    }
-}
-
-function showError(message) {
-    document.getElementById('panel-processing').classList.add('hidden');
-    document.getElementById('panel-error').classList.remove('hidden');
-    document.getElementById('error-text').textContent = message;
-}
-
-function resetApp() {
-    if (pollInterval) clearInterval(pollInterval);
-    currentFile = null;
-    document.getElementById('file-input').value = '';
-    document.getElementById('file-selected').classList.add('hidden');
-    document.getElementById('dropzone').classList.remove('hidden');
-    document.getElementById('panel-result').classList.add('hidden');
-    document.getElementById('panel-error').classList.add('hidden');
-    document.getElementById('panel-input').classList.remove('hidden');
-}
-</script>
+        function pollStatus(jobId) {
+            if (pollInterval) clearInterval(pollInterval);
+            pollInterval = setInterval(() => {
+                fetch(`${API_URL}/status/${jobId}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.status === 'completed') {
+                            clearInterval(pollInterval);
+                            statusText.innerHTML = '<span class="success">✅ Готово!</span>';
+                            progressFill.style.width = '100%';
+                            actions.innerHTML = `<a href="${API_URL}/download/${jobId}.pdf" class="btn" download>Скачать ноты (PDF)</a>`;
+                        } else if (data.status === 'failed') {
+                            clearInterval(pollInterval);
+                            statusText.innerHTML = `<span class="error">❌ Ошибка при обработке</span>`;
+                            progressBar.style.display = 'none';
+                        } else {
+                            progressFill.style.width = (55 + Math.random() * 30) + '%';
+                        }
+                    });
+            }, 3000);
+        }
+    </script>
 </body>
 </html>
