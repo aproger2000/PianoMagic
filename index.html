@@ -1,205 +1,474 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PianoMagic</title>
-<style>
-:root {
-  --bg: #F5F5F7;
-  --surface: rgba(255,255,255,0.72);
-  --text: #1D1D1F;
-  --text2: #86868B;
-  --accent: #007AFF;
-  --accent-h: #0051D5;
-  --border: rgba(0,0,0,0.06);
-  --shadow: 0 12px 40px rgba(0,0,0,0.08);
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #000000;
-    --surface: rgba(28,28,30,0.72);
-    --text: #F5F5F7;
-    --text2: #8E8E93;
-    --accent: #0A84FF;
-    --accent-h: #409CFF;
-    --border: rgba(255,255,255,0.08);
-    --shadow: 0 12px 40px rgba(0,0,0,0.35);
-  }
-}
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 56px 20px 32px;
-  -webkit-font-smoothing: antialiased;
-}
-.logo {
-  width: 84px; height: 84px;
-  filter: drop-shadow(0 6px 16px rgba(0,122,255,0.25));
-  margin-bottom: 24px;
-}
-h1 {
-  font-size: 32px;
-  font-weight: 700;
-  letter-spacing: -0.8px;
-  margin-bottom: 6px;
-}
-.sub {
-  color: var(--text2);
-  font-size: 17px;
-  font-weight: 400;
-  margin-bottom: 40px;
-}
-.drop {
-  width: 100%; max-width: 400px; height: 200px;
-  border: 2px dashed var(--border);
-  border-radius: 28px;
-  background: var(--surface);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  cursor: pointer;
-  transition: all .35s cubic-bezier(.4,0,.2,1);
-  box-shadow: var(--shadow);
-}
-.drop:hover { border-color: var(--accent); transform: scale(1.02); }
-.drop:active { transform: scale(.97); }
-.drop input { display: none; }
-.drop .ic { font-size: 44px; margin-bottom: 10px; opacity: .55; }
-.drop .t1 { font-size: 17px; font-weight: 600; }
-.drop .t2 { font-size: 13px; color: var(--text2); margin-top: 6px; }
-.card {
-  width: 100%; max-width: 400px;
-  margin-top: 24px; padding: 24px;
-  border-radius: 24px;
-  background: var(--surface);
-  backdrop-filter: blur(24px);
-  box-shadow: var(--shadow);
-  display: none;
-}
-.card.on { display: block; }
-.card h3 { font-size: 17px; font-weight: 600; margin-bottom: 16px; }
-.track { width: 100%; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
-.track > div { height: 100%; background: linear-gradient(90deg,var(--accent),#5856D6); width: 0%; transition: width .4s ease; border-radius: 2px; }
-.btn {
-  display: block; width: 100%; margin-top: 16px;
-  padding: 16px; background: var(--accent); color: #fff;
-  border: none; border-radius: 16px; font-size: 17px; font-weight: 600;
-  text-align: center; text-decoration: none; cursor: pointer;
-  transition: background .2s;
-}
-.btn:hover { background: var(--accent-h); }
-.footer {
-  margin-top: auto; padding-top: 48px;
-  text-align: center; font-size: 12px; color: var(--text2);
-}
-.pill {
-  display: inline-flex; gap: 14px;
-  background: var(--surface);
-  padding: 8px 18px; border-radius: 100px;
-  backdrop-filter: blur(12px);
-  box-shadow: var(--shadow);
-}
-.pill b { font-family: 'SF Mono', SFMono-Regular, monospace; font-weight: 600; }
-.err { color: #FF3B30; }
-.ok { color: #34C759; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.45} }
-.pulse { animation: pulse 2.2s infinite; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PianoMagic</title>
+    <style>
+        :root {
+            --bg: #F5F5F7;
+            --card: #FFFFFF;
+            --text: #1D1D1F;
+            --text-secondary: #86868B;
+            --accent: #007AFF;
+            --accent-hover: #0051D5;
+            --success: #34C759;
+            --error: #FF3B30;
+            --border: rgba(0,0,0,0.08);
+            --shadow: 0 4px 24px rgba(0,0,0,0.08);
+            --shadow-lg: 0 12px 48px rgba(0,0,0,0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 48px 20px 32px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Logo */
+        .logo-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .logo-svg {
+            width: 72px;
+            height: 72px;
+            filter: drop-shadow(0 4px 12px rgba(0,122,255,0.25));
+        }
+
+        .brand {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text);
+        }
+
+        .tagline {
+            font-size: 15px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-top: -10px;
+        }
+
+        /* Card */
+        .card {
+            width: 100%;
+            max-width: 440px;
+            background: var(--card);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            padding: 32px;
+            transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1), box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Drop Zone */
+        .drop-zone {
+            width: 100%;
+            height: 200px;
+            border: 2px dashed var(--border);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+            background: var(--bg);
+        }
+
+        .drop-zone:hover {
+            border-color: var(--accent);
+            background: rgba(0,122,255,0.04);
+        }
+
+        .drop-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(0,122,255,0.08);
+            transform: scale(0.98);
+        }
+
+        .drop-zone input {
+            display: none;
+        }
+
+        .drop-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--accent), #5856D6);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0,122,255,0.3);
+        }
+
+        .drop-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .drop-hint {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Status */
+        .status {
+            margin-top: 24px;
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .status.active {
+            display: flex;
+        }
+
+        .status-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .status-icon.processing {
+            background: rgba(0,122,255,0.1);
+            color: var(--accent);
+        }
+
+        .status-icon.success {
+            background: rgba(52,199,89,0.1);
+            color: var(--success);
+        }
+
+        .status-icon.error {
+            background: rgba(255,59,48,0.1);
+            color: var(--error);
+        }
+
+        .status-text {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .status-text.error {
+            color: var(--error);
+        }
+
+        .status-text.success {
+            color: var(--success);
+        }
+
+        /* Progress */
+        .progress-track {
+            width: 100%;
+            height: 4px;
+            background: rgba(0,0,0,0.06);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #5856D6);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        /* Button */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent), #5856D6);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 16px rgba(0,122,255,0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0,122,255,0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: auto;
+            padding-top: 40px;
+            text-align: center;
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .version-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--card);
+            padding: 8px 16px;
+            border-radius: 100px;
+            box-shadow: var(--shadow);
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-family: "SF Mono", SFMono-Regular, ui-monospace, monospace;
+        }
+
+        .version-pill .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        .version-pill .dot.offline {
+            background: var(--error);
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .build-time {
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            body {
+                padding: 32px 16px 24px;
+            }
+            .card {
+                padding: 24px;
+                border-radius: 20px;
+            }
+            .brand {
+                font-size: 24px;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<!-- SVG Logo -->
-<svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#007AFF"/>
-      <stop offset="100%" stop-color="#5856D6"/>
-    </linearGradient>
-  </defs>
-  <rect x="6" y="14" width="88" height="72" rx="18" fill="url(#g)"/>
-  <!-- white keys -->
-  <rect x="16" y="36" width="10" height="38" rx="2" fill="#fff" opacity=".95"/>
-  <rect x="29" y="36" width="10" height="38" rx="2" fill="#fff" opacity=".95"/>
-  <rect x="42" y="36" width="10" height="38" rx="2" fill="#fff" opacity=".95"/>
-  <rect x="55" y="36" width="10" height="38" rx="2" fill="#fff" opacity=".95"/>
-  <rect x="68" y="36" width="10" height="38" rx="2" fill="#fff" opacity=".95"/>
-  <rect x="81" y="36" width="10" height="38" rx="2" fill="#fff" opacity=".95"/>
-  <!-- black keys -->
-  <rect x="21" y="36" width="6" height="22" rx="1.5" fill="#1D1D1F" opacity=".92"/>
-  <rect x="34" y="36" width="6" height="22" rx="1.5" fill="#1D1D1F" opacity=".92"/>
-  <rect x="60" y="36" width="6" height="22" rx="1.5" fill="#1D1D1F" opacity=".92"/>
-  <rect x="73" y="36" width="6" height="22" rx="1.5" fill="#1D1D1F" opacity=".92"/>
-  <!-- note -->
-  <ellipse cx="40" cy="28" rx="6.5" ry="5.5" fill="#fff"/>
-  <rect x="45.5" y="12" width="2.5" height="18" rx="1.2" fill="#fff"/>
-</svg>
+    <div class="logo-wrap">
+        <svg class="logo-svg" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="72" height="72" rx="18" fill="url(#logoGrad)"/>
+            <rect x="22" y="20" width="8" height="36" rx="2" fill="white" fill-opacity="0.95"/>
+            <rect x="42" y="24" width="8" height="32" rx="2" fill="white" fill-opacity="0.6"/>
+            <circle cx="50" cy="18" r="5" fill="white"/>
+            <defs>
+                <linearGradient id="logoGrad" x1="0" y1="0" x2="72" y2="72" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#007AFF"/>
+                    <stop offset="1" stop-color="#5856D6"/>
+                </linearGradient>
+            </defs>
+        </svg>
+        <div class="brand">PianoMagic</div>
+        <div class="tagline">Аудио → Ноты</div>
+    </div>
 
-<h1>PianoMagic</h1>
-<p class="sub">Аудио в ноты за секунды</p>
+    <div class="card">
+        <div class="drop-zone" id="dropZone">
+            <input type="file" id="fileInput" accept="audio/*">
+            <div class="drop-icon">🎵</div>
+            <div class="drop-title">Перетащите аудиофайл</div>
+            <div class="drop-hint">MP3 · WAV · FLAC · M4A · OGG</div>
+        </div>
 
-<div class="drop" id="dz">
-  <input type="file" id="fi" accept="audio/*">
-  <div class="ic">🎵</div>
-  <div class="t1">Перетащите аудиофайл</div>
-  <div class="t2">MP3 · WAV · FLAC · M4A · OGG</div>
-</div>
+        <div class="status" id="status">
+            <div class="status-header">
+                <div class="status-icon processing" id="statusIcon">⟳</div>
+                <div class="status-text" id="statusText">Загрузка на сервер...</div>
+            </div>
+            <div class="progress-track" id="progressTrack">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div id="actions"></div>
+        </div>
+    </div>
 
-<div class="card" id="st">
-  <h3 id="stt" class="pulse">Обработка…</h3>
-  <div class="track"><div id="bar"></div></div>
-  <div id="act"></div>
-</div>
+    <div class="footer">
+        <div class="version-pill">
+            <span class="dot" id="beDot"></span>
+            <span>FE <strong id="feVersion">—</strong></span>
+            <span style="opacity:0.3">|</span>
+            <span>BE <strong id="beVersion">—</strong></span>
+        </div>
+        <div class="build-time" id="buildTime"></div>
+    </div>
 
-<div class="footer">
-  <div class="pill">
-    <span>FE <b id="vfe">—</b></span>
-    <span>BE <b id="vbe">—</b></span>
-  </div>
-  <div style="margin-top:8px;opacity:.55" id="bt"></div>
-</div>
+    <script>
+        const API_URL = 'https://pianomagic-api.onrender.com';
+        const FE_VERSION = '3.2.0';
 
-<script>
-const API='https://pianomagic-api.onrender.com', V='3.1.0';
-document.getElementById('vfe').textContent=V;
-document.getElementById('bt').textContent=new Date().toISOString().slice(0,19).replace('T',' ')+' UTC';
-fetch(API+'/').then(r=>r.json()).then(d=>document.getElementById('vbe').textContent=d.version||'?').catch(()=>{document.getElementById('vbe').textContent='offline';document.getElementById('vbe').className='err'});
+        document.getElementById('feVersion').textContent = FE_VERSION;
+        document.getElementById('buildTime').textContent =
+            'Build: ' + new Date().toISOString().slice(0, 19).replace('T', ' ') + ' UTC';
 
-const dz=document.getElementById('dz'), fi=document.getElementById('fi'), st=document.getElementById('st'), stt=document.getElementById('stt'), bar=document.getElementById('bar'), act=document.getElementById('act');
-let iv;
+        fetch(`${API_URL}/`)
+            .then(r => r.ok ? r.json() : Promise.reject())
+            .then(data => {
+                document.getElementById('beVersion').textContent = data.version || '?';
+            })
+            .catch(() => {
+                document.getElementById('beVersion').textContent = 'offline';
+                document.getElementById('beDot').classList.add('offline');
+            });
 
-dz.addEventListener('click',()=>fi.click());
-['dragover','dragenter'].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.style.borderColor='var(--accent)'}));
-['dragleave','drop'].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.style.borderColor='';if(e==='drop'&&ev.dataTransfer.files.length)go(ev.dataTransfer.files[0])}));
-fi.addEventListener('change',e=>{if(e.target.files.length)go(e.target.files[0])});
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const status = document.getElementById('status');
+        const statusIcon = document.getElementById('statusIcon');
+        const statusText = document.getElementById('statusText');
+        const progressFill = document.getElementById('progressFill');
+        const actions = document.getElementById('actions');
+        let pollInterval;
 
-function go(file){
-  if(!/(mp3|wav|flac|m4a|ogg)$/i.test(file.name)&&!file.type.startsWith('audio/')){alert('Выберите аудиофайл');return}
-  st.classList.add('on'); stt.textContent='Загрузка…'; stt.className='pulse'; bar.style.width='20%'; act.innerHTML='';
-  const fd=new FormData(); fd.append('file',file);
-  fetch(API+'/transcribe/file',{method:'POST',body:fd})
-    .then(r=>r.json()).then(d=>{
-      if(d.job_id){stt.textContent='Транскрипция нот…'; bar.style.width='50%'; poll(d.job_id);}
-      else throw new Error('Нет job_id');
-    }).catch(e=>{stt.innerHTML='<span class="err">Ошибка: '+e.message+'</span>'; stt.className=''; bar.style.width='0%';});
-}
-function poll(id){
-  if(iv)clearInterval(iv);
-  iv=setInterval(()=>{
-    fetch(API+'/status/'+id).then(r=>r.json()).then(d=>{
-      if(d.status==='completed'){clearInterval(iv); stt.innerHTML='<span class="ok">Готово!</span>'; stt.className=''; bar.style.width='100%'; act.innerHTML='<a href="'+API+'/download/'+id+'.pdf" class="btn" download>Скачать ноты (PDF)</a>';}
-      else if(d.status==='failed'){clearInterval(iv); stt.innerHTML='<span class="err">Ошибка обработки</span>'; stt.className=''; bar.style.width='0%';}
-      else bar.style.width=(55+Math.random()*30)+'%';
-    });
-  },3000);
-}
-</script>
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        ['dragover', 'dragenter'].forEach(evt => {
+            dropZone.addEventListener(evt, e => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(evt => {
+            dropZone.addEventListener(evt, e => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                if (evt === 'drop' && e.dataTransfer.files.length) {
+                    handleFile(e.dataTransfer.files[0]);
+                }
+            });
+        });
+
+        fileInput.addEventListener('change', e => {
+            if (e.target.files.length) handleFile(e.target.files[0]);
+        });
+
+        function handleFile(file) {
+            const valid = /\.(mp3|wav|flac|m4a|ogg)$/i.test(file.name) || file.type.startsWith('audio/');
+            if (!valid) {
+                alert('Выберите аудиофайл (MP3, WAV, FLAC, M4A, OGG)');
+                return;
+            }
+
+            status.classList.add('active');
+            statusIcon.className = 'status-icon processing';
+            statusIcon.textContent = '⟳';
+            statusText.className = 'status-text';
+            statusText.textContent = 'Загрузка на сервер...';
+            progressFill.style.width = '20%';
+            actions.innerHTML = '';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch(`${API_URL}/transcribe/file`, { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.job_id) {
+                        statusText.textContent = 'ИИ анализирует аудио...';
+                        progressFill.style.width = '45%';
+                        pollStatus(data.job_id);
+                    } else {
+                        throw new Error('Нет job_id');
+                    }
+                })
+                .catch(err => {
+                    statusIcon.className = 'status-icon error';
+                    statusIcon.textContent = '✕';
+                    statusText.className = 'status-text error';
+                    statusText.textContent = 'Ошибка загрузки';
+                    progressFill.style.width = '0%';
+                });
+        }
+
+        function pollStatus(jobId) {
+            if (pollInterval) clearInterval(pollInterval);
+            pollInterval = setInterval(() => {
+                fetch(`${API_URL}/status/${jobId}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.status === 'completed') {
+                            clearInterval(pollInterval);
+                            statusIcon.className = 'status-icon success';
+                            statusIcon.textContent = '✓';
+                            statusText.className = 'status-text success';
+                            statusText.textContent = 'Готово!';
+                            progressFill.style.width = '100%';
+                            actions.innerHTML = `<a href="${API_URL}/download/${jobId}.pdf" class="btn" download>📄 Скачать ноты (PDF)</a>`;
+                        } else if (data.status === 'failed') {
+                            clearInterval(pollInterval);
+                            statusIcon.className = 'status-icon error';
+                            statusIcon.textContent = '✕';
+                            statusText.className = 'status-text error';
+                            statusText.textContent = 'Ошибка обработки';
+                            progressFill.style.width = '0%';
+                        } else {
+                            const w = 45 + Math.random() * 40;
+                            progressFill.style.width = w + '%';
+                        }
+                    });
+            }, 3000);
+        }
+    </script>
 </body>
 </html>
