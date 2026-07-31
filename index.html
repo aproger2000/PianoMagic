@@ -1,245 +1,205 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PianoMagic</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 24px 16px;
-        }
-        h1 { margin-top: 40px; font-size: 2rem; letter-spacing: -0.5px; }
-        .subtitle { color: #a0a0c0; margin: 8px 0 32px; font-size: 0.95rem; }
-        .drop-zone {
-            width: 100%;
-            max-width: 480px;
-            height: 180px;
-            border: 2px dashed #00d4aa;
-            border-radius: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            background: rgba(0, 212, 170, 0.06);
-        }
-        .drop-zone:active, .drop-zone.dragover {
-            background: rgba(0, 212, 170, 0.18);
-            transform: scale(0.98);
-        }
-        .drop-zone input { display: none; }
-        .icon { font-size: 2.8rem; margin-bottom: 8px; filter: grayscale(0.2); }
-        .hint { font-size: 0.85rem; color: #8080a0; margin-top: 6px; }
-        .status {
-            margin-top: 28px;
-            padding: 20px;
-            border-radius: 16px;
-            background: rgba(255,255,255,0.06);
-            max-width: 480px;
-            width: 100%;
-            display: none;
-            backdrop-filter: blur(10px);
-        }
-        .status.active { display: block; }
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 3px;
-            overflow: hidden;
-            margin-top: 14px;
-        }
-        .progress-bar .fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00d4aa, #00a8e8);
-            width: 0%;
-            transition: width 0.4s ease;
-        }
-        .btn {
-            display: inline-block;
-            margin-top: 16px;
-            padding: 14px 28px;
-            background: linear-gradient(135deg, #00d4aa, #00a8e8);
-            color: #0f0c29;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 1rem;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            text-align: center;
-        }
-        .error { color: #ff6b8a; }
-        .success { color: #00d4aa; }
-
-        /* Подвал с версиями */
-        .footer {
-            margin-top: auto;
-            padding-top: 40px;
-            text-align: center;
-            font-size: 0.75rem;
-            color: #606080;
-            width: 100%;
-            max-width: 480px;
-        }
-        .footer .version-row {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-bottom: 8px;
-        }
-        .footer .version-row span {
-            background: rgba(255,255,255,0.05);
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-family: 'SF Mono', Monaco, monospace;
-        }
-        .footer .version-row .label { color: #8080a0; }
-        .footer .version-row .value { color: #00d4aa; }
-        .footer .version-row .value.err { color: #ff6b8a; }
-        .footer .cache-hint {
-            margin-top: 8px;
-            font-size: 0.7rem;
-            color: #505070;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PianoMagic</title>
+<style>
+:root {
+  --bg: #F5F5F7;
+  --surface: rgba(255,255,255,0.72);
+  --text: #1D1D1F;
+  --text2: #86868B;
+  --accent: #007AFF;
+  --accent-h: #0051D5;
+  --border: rgba(0,0,0,0.06);
+  --shadow: 0 12px 40px rgba(0,0,0,0.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #000000;
+    --surface: rgba(28,28,30,0.72);
+    --text: #F5F5F7;
+    --text2: #8E8E93;
+    --accent: #0A84FF;
+    --accent-h: #409CFF;
+    --border: rgba(255,255,255,0.08);
+    --shadow: 0 12px 40px rgba(0,0,0,0.35);
+  }
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 56px 20px 32px;
+  -webkit-font-smoothing: antialiased;
+}
+.logo {
+  width: 84px; height: 84px;
+  filter: drop-shadow(0 6px 16px rgba(0,122,255,0.25));
+  margin-bottom: 24px;
+}
+h1 {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.8px;
+  margin-bottom: 6px;
+}
+.sub {
+  color: var(--text2);
+  font-size: 17px;
+  font-weight: 400;
+  margin-bottom: 40px;
+}
+.drop {
+  width: 100%; max-width: 400px; height: 200px;
+  border: 2px dashed var(--border);
+  border-radius: 28px;
+  background: var(--surface);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all .35s cubic-bezier(.4,0,.2,1);
+  box-shadow: var(--shadow);
+}
+.drop:hover { border-color: var(--accent); transform: scale(1.02); }
+.drop:active { transform: scale(.97); }
+.drop input { display: none; }
+.drop .ic { font-size: 44px; margin-bottom: 10px; opacity: .55; }
+.drop .t1 { font-size: 17px; font-weight: 600; }
+.drop .t2 { font-size: 13px; color: var(--text2); margin-top: 6px; }
+.card {
+  width: 100%; max-width: 400px;
+  margin-top: 24px; padding: 24px;
+  border-radius: 24px;
+  background: var(--surface);
+  backdrop-filter: blur(24px);
+  box-shadow: var(--shadow);
+  display: none;
+}
+.card.on { display: block; }
+.card h3 { font-size: 17px; font-weight: 600; margin-bottom: 16px; }
+.track { width: 100%; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.track > div { height: 100%; background: linear-gradient(90deg,var(--accent),#5856D6); width: 0%; transition: width .4s ease; border-radius: 2px; }
+.btn {
+  display: block; width: 100%; margin-top: 16px;
+  padding: 16px; background: var(--accent); color: #fff;
+  border: none; border-radius: 16px; font-size: 17px; font-weight: 600;
+  text-align: center; text-decoration: none; cursor: pointer;
+  transition: background .2s;
+}
+.btn:hover { background: var(--accent-h); }
+.footer {
+  margin-top: auto; padding-top: 48px;
+  text-align: center; font-size: 12px; color: var(--text2);
+}
+.pill {
+  display: inline-flex; gap: 14px;
+  background: var(--surface);
+  padding: 8px 18px; border-radius: 100px;
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow);
+}
+.pill b { font-family: 'SF Mono', SFMono-Regular, monospace; font-weight: 600; }
+.err { color: #FF3B30; }
+.ok { color: #34C759; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.45} }
+.pulse { animation: pulse 2.2s infinite; }
+</style>
 </head>
 <body>
-    <h1>🎹 PianoMagic</h1>
-    <p class="subtitle">Аудио → Ноты (PDF)</p>
 
-    <div class="drop-zone" id="dropZone">
-        <input type="file" id="fileInput" accept="audio/*">
-        <div class="icon">📁</div>
-        <div>Перетащите аудиофайл сюда</div>
-        <div class="hint">MP3 · WAV · FLAC · M4A · OGG</div>
-    </div>
+<!-- SVG Logo -->
+<svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#007AFF"/>
+      <stop offset="100%" stop-color="#5856D6"/>
+    </linearGradient>
+  </defs>
+  <rect x="6" y="14" width="88" height="72" rx="18" fill="url(#g)"/>
+  <!-- white keys -->
+  <rect x="16" y="36" width="10" height="38" rx="2" fill="#fff" opacity=".95"/>
+  <rect x="29" y="36" width="10" height="38" rx="2" fill="#fff" opacity=".95"/>
+  <rect x="42" y="36" width="10" height="38" rx="2" fill="#fff" opacity=".95"/>
+  <rect x="55" y="36" width="10" height="38" rx="2" fill="#fff" opacity=".95"/>
+  <rect x="68" y="36" width="10" height="38" rx="2" fill="#fff" opacity=".95"/>
+  <rect x="81" y="36" width="10" height="38" rx="2" fill="#fff" opacity=".95"/>
+  <!-- black keys -->
+  <rect x="21" y="36" width="6" height="22" rx="1.5" fill="#1D1D1F" opacity=".92"/>
+  <rect x="34" y="36" width="6" height="22" rx="1.5" fill="#1D1D1F" opacity=".92"/>
+  <rect x="60" y="36" width="6" height="22" rx="1.5" fill="#1D1D1F" opacity=".92"/>
+  <rect x="73" y="36" width="6" height="22" rx="1.5" fill="#1D1D1F" opacity=".92"/>
+  <!-- note -->
+  <ellipse cx="40" cy="28" rx="6.5" ry="5.5" fill="#fff"/>
+  <rect x="45.5" y="12" width="2.5" height="18" rx="1.2" fill="#fff"/>
+</svg>
 
-    <div class="status" id="status">
-        <div id="statusText">Загрузка...</div>
-        <div class="progress-bar" id="progressBar" style="display:none;">
-            <div class="fill" id="progressFill"></div>
-        </div>
-        <div id="actions"></div>
-    </div>
+<h1>PianoMagic</h1>
+<p class="sub">Аудио в ноты за секунды</p>
 
-    <!-- Подвал с версиями -->
-    <div class="footer" id="footer">
-        <div class="version-row">
-            <span><span class="label">Frontend:</span> <span class="value" id="feVersion">—</span></span>
-            <span><span class="label">Backend:</span> <span class="value" id="beVersion">—</span></span>
-        </div>
-        <div class="cache-hint" id="cacheHint"></div>
-    </div>
+<div class="drop" id="dz">
+  <input type="file" id="fi" accept="audio/*">
+  <div class="ic">🎵</div>
+  <div class="t1">Перетащите аудиофайл</div>
+  <div class="t2">MP3 · WAV · FLAC · M4A · OGG</div>
+</div>
 
-    <script>
-        const API_URL = 'https://pianomagic-api.onrender.com';
-        const FE_VERSION = '3.1.0'; // Меняй при каждом обновлении index.html
+<div class="card" id="st">
+  <h3 id="stt" class="pulse">Обработка…</h3>
+  <div class="track"><div id="bar"></div></div>
+  <div id="act"></div>
+</div>
 
-        // Показываем версию фронтенда сразу
-        document.getElementById('feVersion').textContent = FE_VERSION;
+<div class="footer">
+  <div class="pill">
+    <span>FE <b id="vfe">—</b></span>
+    <span>BE <b id="vbe">—</b></span>
+  </div>
+  <div style="margin-top:8px;opacity:.55" id="bt"></div>
+</div>
 
-        // Запрашиваем версию бэкенда
-        fetch(`${API_URL}/`)
-            .then(r => r.ok ? r.json() : Promise.reject(r.status))
-            .then(data => {
-                document.getElementById('beVersion').textContent = data.version || 'unknown';
-            })
-            .catch(err => {
-                document.getElementById('beVersion').textContent = 'offline';
-                document.getElementById('beVersion').classList.add('err');
-            });
+<script>
+const API='https://pianomagic-api.onrender.com', V='3.1.0';
+document.getElementById('vfe').textContent=V;
+document.getElementById('bt').textContent=new Date().toISOString().slice(0,19).replace('T',' ')+' UTC';
+fetch(API+'/').then(r=>r.json()).then(d=>document.getElementById('vbe').textContent=d.version||'?').catch(()=>{document.getElementById('vbe').textContent='offline';document.getElementById('vbe').className='err'});
 
-        // Показываем подсказку про кэш
-        document.getElementById('cacheHint').textContent = 
-            `Build: ${new Date().toISOString().slice(0,19).replace('T',' ')} UTC`;
+const dz=document.getElementById('dz'), fi=document.getElementById('fi'), st=document.getElementById('st'), stt=document.getElementById('stt'), bar=document.getElementById('bar'), act=document.getElementById('act');
+let iv;
 
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
-        const status = document.getElementById('status');
-        const statusText = document.getElementById('statusText');
-        const progressBar = document.getElementById('progressBar');
-        const progressFill = document.getElementById('progressFill');
-        const actions = document.getElementById('actions');
-        let pollInterval;
+dz.addEventListener('click',()=>fi.click());
+['dragover','dragenter'].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.style.borderColor='var(--accent)'}));
+['dragleave','drop'].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.style.borderColor='';if(e==='drop'&&ev.dataTransfer.files.length)go(ev.dataTransfer.files[0])}));
+fi.addEventListener('change',e=>{if(e.target.files.length)go(e.target.files[0])});
 
-        dropZone.addEventListener('click', () => fileInput.click());
-
-        ['dragover','dragenter'].forEach(evt => {
-            dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); });
-        });
-        ['dragleave','drop'].forEach(evt => {
-            dropZone.addEventListener(evt, e => {
-                e.preventDefault();
-                dropZone.classList.remove('dragover');
-                if (evt === 'drop' && e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
-            });
-        });
-
-        fileInput.addEventListener('change', e => {
-            if (e.target.files.length) handleFile(e.target.files[0]);
-        });
-
-        function handleFile(file) {
-            const valid = /\.(mp3|wav|flac|m4a|ogg)$/i.test(file.name) || file.type.startsWith('audio/');
-            if (!valid) { alert('Выберите аудиофайл (MP3, WAV, FLAC, M4A, OGG)'); return; }
-
-            status.classList.add('active');
-            statusText.textContent = 'Загрузка на сервер...';
-            progressBar.style.display = 'block';
-            progressFill.style.width = '25%';
-            actions.innerHTML = '';
-
-            const formData = new FormData();
-            formData.append('file', file);
-
-            fetch(`${API_URL}/transcribe/file`, { method: 'POST', body: formData })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.job_id) {
-                        statusText.textContent = 'ИИ транскрибирует ноты...';
-                        progressFill.style.width = '50%';
-                        pollStatus(data.job_id);
-                    } else throw new Error('Сервер не вернул job_id');
-                })
-                .catch(err => {
-                    statusText.innerHTML = `<span class="error">Ошибка: ${err.message}</span>`;
-                    progressBar.style.display = 'none';
-                });
-        }
-
-        function pollStatus(jobId) {
-            if (pollInterval) clearInterval(pollInterval);
-            pollInterval = setInterval(() => {
-                fetch(`${API_URL}/status/${jobId}`)
-                    .then(r => r.json())
-                    .then(data => {
-                        if (data.status === 'completed') {
-                            clearInterval(pollInterval);
-                            statusText.innerHTML = '<span class="success">✅ Готово!</span>';
-                            progressFill.style.width = '100%';
-                            actions.innerHTML = `<a href="${API_URL}/download/${jobId}.pdf" class="btn" download>Скачать ноты (PDF)</a>`;
-                        } else if (data.status === 'failed') {
-                            clearInterval(pollInterval);
-                            statusText.innerHTML = `<span class="error">❌ Ошибка при обработке</span>`;
-                            progressBar.style.display = 'none';
-                        } else {
-                            progressFill.style.width = (55 + Math.random() * 30) + '%';
-                        }
-                    });
-            }, 3000);
-        }
-    </script>
+function go(file){
+  if(!/(mp3|wav|flac|m4a|ogg)$/i.test(file.name)&&!file.type.startsWith('audio/')){alert('Выберите аудиофайл');return}
+  st.classList.add('on'); stt.textContent='Загрузка…'; stt.className='pulse'; bar.style.width='20%'; act.innerHTML='';
+  const fd=new FormData(); fd.append('file',file);
+  fetch(API+'/transcribe/file',{method:'POST',body:fd})
+    .then(r=>r.json()).then(d=>{
+      if(d.job_id){stt.textContent='Транскрипция нот…'; bar.style.width='50%'; poll(d.job_id);}
+      else throw new Error('Нет job_id');
+    }).catch(e=>{stt.innerHTML='<span class="err">Ошибка: '+e.message+'</span>'; stt.className=''; bar.style.width='0%';});
+}
+function poll(id){
+  if(iv)clearInterval(iv);
+  iv=setInterval(()=>{
+    fetch(API+'/status/'+id).then(r=>r.json()).then(d=>{
+      if(d.status==='completed'){clearInterval(iv); stt.innerHTML='<span class="ok">Готово!</span>'; stt.className=''; bar.style.width='100%'; act.innerHTML='<a href="'+API+'/download/'+id+'.pdf" class="btn" download>Скачать ноты (PDF)</a>';}
+      else if(d.status==='failed'){clearInterval(iv); stt.innerHTML='<span class="err">Ошибка обработки</span>'; stt.className=''; bar.style.width='0%';}
+      else bar.style.width=(55+Math.random()*30)+'%';
+    });
+  },3000);
+}
+</script>
 </body>
 </html>
