@@ -11,302 +11,95 @@
             --text: #1D1D1F;
             --text-secondary: #86868B;
             --accent: #007AFF;
-            --accent-hover: #0051D5;
             --success: #34C759;
             --error: #FF3B30;
             --border: rgba(0,0,0,0.08);
             --shadow: 0 4px 24px rgba(0,0,0,0.08);
             --shadow-lg: 0 12px 48px rgba(0,0,0,0.12);
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 48px 20px 32px;
-            -webkit-font-smoothing: antialiased;
+            background: var(--bg); color: var(--text); min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 48px 20px 32px; -webkit-font-smoothing: antialiased;
         }
-
-        /* Logo */
-        .logo-wrap {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 40px;
-        }
-
-        .logo-svg {
-            width: 72px;
-            height: 72px;
-            filter: drop-shadow(0 4px 12px rgba(0,122,255,0.25));
-        }
-
-        .brand {
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            color: var(--text);
-        }
-
-        .tagline {
-            font-size: 15px;
-            color: var(--text-secondary);
-            font-weight: 400;
-            margin-top: -10px;
-        }
-
-        /* Card */
+        .logo-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; margin-bottom: 40px; }
+        .logo-svg { width: 72px; height: 72px; filter: drop-shadow(0 4px 12px rgba(0,122,255,0.25)); }
+        .brand { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+        .tagline { font-size: 15px; color: var(--text-secondary); font-weight: 400; margin-top: -10px; }
         .card {
-            width: 100%;
-            max-width: 440px;
-            background: var(--card);
-            border-radius: 24px;
-            box-shadow: var(--shadow);
-            padding: 32px;
-            transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1), box-shadow 0.3s ease;
+            width: 100%; max-width: 440px; background: var(--card);
+            border-radius: 24px; box-shadow: var(--shadow); padding: 32px;
+            transition: box-shadow 0.3s ease;
         }
-
-        .card:hover {
-            box-shadow: var(--shadow-lg);
-        }
-
-        /* Drop Zone */
+        .card:hover { box-shadow: var(--shadow-lg); }
         .drop-zone {
-            width: 100%;
-            height: 200px;
-            border: 2px dashed var(--border);
-            border-radius: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-            background: var(--bg);
+            width: 100%; height: 200px; border: 2px dashed var(--border); border-radius: 20px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+            cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1); background: var(--bg);
         }
-
-        .drop-zone:hover {
-            border-color: var(--accent);
-            background: rgba(0,122,255,0.04);
-        }
-
-        .drop-zone.dragover {
-            border-color: var(--accent);
-            background: rgba(0,122,255,0.08);
-            transform: scale(0.98);
-        }
-
-        .drop-zone input {
-            display: none;
-        }
-
+        .drop-zone:hover { border-color: var(--accent); background: rgba(0,122,255,0.04); }
+        .drop-zone.dragover { border-color: var(--accent); background: rgba(0,122,255,0.08); transform: scale(0.98); }
+        .drop-zone input { display: none; }
         .drop-icon {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, var(--accent), #5856D6);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            box-shadow: 0 4px 12px rgba(0,122,255,0.3);
+            width: 56px; height: 56px; background: linear-gradient(135deg, var(--accent), #5856D6);
+            border-radius: 16px; display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 24px; box-shadow: 0 4px 12px rgba(0,122,255,0.3);
         }
-
-        .drop-title {
-            font-size: 17px;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .drop-hint {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        /* Status */
-        .status {
-            margin-top: 24px;
-            display: none;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .status.active {
-            display: flex;
-        }
-
-        .status-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
+        .drop-title { font-size: 17px; font-weight: 600; }
+        .drop-hint { font-size: 13px; color: var(--text-secondary); }
+        .status { margin-top: 24px; display: none; flex-direction: column; gap: 16px; }
+        .status.active { display: flex; }
+        .status-header { display: flex; align-items: center; gap: 12px; }
         .status-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            flex-shrink: 0;
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; flex-shrink: 0;
         }
-
-        .status-icon.processing {
-            background: rgba(0,122,255,0.1);
-            color: var(--accent);
+        .status-icon.processing { background: rgba(0,122,255,0.1); color: var(--accent); }
+        .status-icon.success { background: rgba(52,199,89,0.1); color: var(--success); }
+        .status-icon.error { background: rgba(255,59,48,0.1); color: var(--error); }
+        .status-text { font-size: 15px; font-weight: 500; }
+        .status-text.error { color: var(--error); }
+        .status-text.success { color: var(--success); }
+        .error-detail {
+            font-size: 12px; color: var(--error); opacity: 0.85;
+            background: rgba(255,59,48,0.06); padding: 8px 12px;
+            border-radius: 8px; font-family: "SF Mono", monospace; word-break: break-all;
         }
-
-        .status-icon.success {
-            background: rgba(52,199,89,0.1);
-            color: var(--success);
-        }
-
-        .status-icon.error {
-            background: rgba(255,59,48,0.1);
-            color: var(--error);
-        }
-
-        .status-text {
-            font-size: 15px;
-            font-weight: 500;
-            color: var(--text);
-        }
-
-        .status-text.error {
-            color: var(--error);
-        }
-
-        .status-text.success {
-            color: var(--success);
-        }
-
-        /* Progress */
-        .progress-track {
-            width: 100%;
-            height: 4px;
-            background: rgba(0,0,0,0.06);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
+        .progress-track { width: 100%; height: 4px; background: rgba(0,0,0,0.06); border-radius: 2px; overflow: hidden; }
         .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent), #5856D6);
-            border-radius: 2px;
-            width: 0%;
+            height: 100%; background: linear-gradient(90deg, var(--accent), #5856D6);
+            border-radius: 2px; width: 0%;
             transition: width 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
-
-        /* Button */
         .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            padding: 16px;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%; padding: 16px;
             background: linear-gradient(135deg, var(--accent), #5856D6);
-            color: white;
-            border: none;
-            border-radius: 16px;
-            font-size: 16px;
-            font-weight: 600;
-            font-family: inherit;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.2s ease;
+            color: white; border: none; border-radius: 16px;
+            font-size: 16px; font-weight: 600; font-family: inherit;
+            cursor: pointer; text-decoration: none; transition: all 0.2s ease;
             box-shadow: 0 4px 16px rgba(0,122,255,0.3);
         }
-
-        .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(0,122,255,0.4);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        /* Footer */
-        .footer {
-            margin-top: auto;
-            padding-top: 40px;
-            text-align: center;
-            width: 100%;
-            max-width: 440px;
-        }
-
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,122,255,0.4); }
+        .footer { margin-top: auto; padding-top: 40px; text-align: center; width: 100%; max-width: 440px; }
         .version-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            background: var(--card);
-            padding: 8px 16px;
-            border-radius: 100px;
-            box-shadow: var(--shadow);
-            font-size: 12px;
-            color: var(--text-secondary);
-            font-family: "SF Mono", SFMono-Regular, ui-monospace, monospace;
+            display: inline-flex; align-items: center; gap: 12px;
+            background: var(--card); padding: 8px 16px; border-radius: 100px;
+            box-shadow: var(--shadow); font-size: 12px; color: var(--text-secondary);
+            font-family: "SF Mono", SFMono-Regular, ui-monospace, monospace; flex-wrap: wrap; justify-content: center;
         }
-
-        .version-pill .dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--success);
-            animation: pulse 2s infinite;
-        }
-
-        .version-pill .err-msg {
-            color: var(--error);
-            font-size: 11px;
-            margin-left: 8px;
-        }
-
-        .version-pill .dot.offline {
-            background: var(--error);
-            animation: none;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .build-time {
-            margin-top: 8px;
-            font-size: 11px;
-            color: var(--text-secondary);
-            opacity: 0.6;
-        }
-
-        /* Responsive */
+        .version-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); animation: pulse 2s infinite; }
+        .version-pill .dot.offline { background: var(--error); animation: none; }
+        .version-pill .err-msg { color: var(--error); font-size: 11px; margin-left: 4px; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+        .build-time { margin-top: 8px; font-size: 11px; color: var(--text-secondary); opacity: 0.6; }
         @media (max-width: 480px) {
-            body {
-                padding: 32px 16px 24px;
-            }
-            .card {
-                padding: 24px;
-                border-radius: 20px;
-            }
-            .brand {
-                font-size: 24px;
-            }
+            body { padding: 32px 16px 24px; }
+            .card { padding: 24px; border-radius: 20px; }
+            .brand { font-size: 24px; }
         }
     </style>
 </head>
@@ -320,8 +113,7 @@
             <circle cx="50" cy="18" r="5" fill="white"/>
             <defs>
                 <linearGradient id="logoGrad" x1="0" y1="0" x2="72" y2="72" gradientUnits="userSpaceOnUse">
-                    <stop stop-color="#007AFF"/>
-                    <stop offset="1" stop-color="#5856D6"/>
+                    <stop stop-color="#007AFF"/><stop offset="1" stop-color="#5856D6"/>
                 </linearGradient>
             </defs>
         </svg>
@@ -346,23 +138,24 @@
                 <div class="progress-fill" id="progressFill"></div>
             </div>
             <div id="actions"></div>
+            <div class="error-detail" id="errorDetail" style="display:none;"></div>
         </div>
     </div>
 
-<div class="footer">
-    <div class="version-pill">
-        <span class="dot" id="beDot"></span>
-        <span>FE <strong id="feVersion">—</strong></span>
-        <span style="opacity:0.3">|</span>
-        <span>BE <strong id="beVersion">—</strong></span>
-        <span class="err-msg" id="footerError"></span>
+    <div class="footer">
+        <div class="version-pill">
+            <span class="dot" id="beDot"></span>
+            <span>FE <strong id="feVersion">—</strong></span>
+            <span style="opacity:0.3">|</span>
+            <span>BE <strong id="beVersion">—</strong></span>
+            <span class="err-msg" id="footerError"></span>
+        </div>
+        <div class="build-time" id="buildTime"></div>
     </div>
-    <div class="build-time" id="buildTime"></div>
-</div>
 
     <script>
         const API_URL = 'https://pianomagic-api.onrender.com';
-        const FE_VERSION = '3.2.2';
+        const FE_VERSION = '3.2.3';
 
         document.getElementById('feVersion').textContent = FE_VERSION;
         document.getElementById('buildTime').textContent =
@@ -373,12 +166,11 @@
             .then(data => {
                 document.getElementById('beVersion').textContent = data.version || '?';
             })
-        .catch(() => {
-            document.getElementById('beVersion').textContent = 'offline';
-            document.getElementById('beDot').classList.add('offline');
-            const footerErr = document.getElementById('footerError');
-            if (footerErr) footerErr.textContent = 'Backend offline';
-        });
+            .catch(() => {
+                document.getElementById('beVersion').textContent = 'offline';
+                document.getElementById('beDot').classList.add('offline');
+                document.getElementById('footerError').textContent = 'Backend offline';
+            });
 
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
@@ -387,45 +179,32 @@
         const statusText = document.getElementById('statusText');
         const progressFill = document.getElementById('progressFill');
         const actions = document.getElementById('actions');
+        const errorDetail = document.getElementById('errorDetail');
         let pollInterval;
 
         dropZone.addEventListener('click', () => fileInput.click());
 
         ['dragover', 'dragenter'].forEach(evt => {
-            dropZone.addEventListener(evt, e => {
-                e.preventDefault();
-                dropZone.classList.add('dragover');
-            });
+            dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); });
         });
-
         ['dragleave', 'drop'].forEach(evt => {
             dropZone.addEventListener(evt, e => {
-                e.preventDefault();
-                dropZone.classList.remove('dragover');
-                if (evt === 'drop' && e.dataTransfer.files.length) {
-                    handleFile(e.dataTransfer.files[0]);
-                }
+                e.preventDefault(); dropZone.classList.remove('dragover');
+                if (evt === 'drop' && e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
             });
         });
-
-        fileInput.addEventListener('change', e => {
-            if (e.target.files.length) handleFile(e.target.files[0]);
-        });
+        fileInput.addEventListener('change', e => { if (e.target.files.length) handleFile(e.target.files[0]); });
 
         function handleFile(file) {
             const valid = /\.(mp3|wav|flac|m4a|ogg)$/i.test(file.name) || file.type.startsWith('audio/');
-            if (!valid) {
-                alert('Выберите аудиофайл (MP3, WAV, FLAC, M4A, OGG)');
-                return;
-            }
+            if (!valid) { alert('Выберите аудиофайл (MP3, WAV, FLAC, M4A, OGG)'); return; }
 
             status.classList.add('active');
-            statusIcon.className = 'status-icon processing';
-            statusIcon.textContent = '⟳';
-            statusText.className = 'status-text';
-            statusText.textContent = 'Загрузка на сервер...';
-            progressFill.style.width = '20%';
-            actions.innerHTML = '';
+            statusIcon.className = 'status-icon processing'; statusIcon.textContent = '⟳';
+            statusText.className = 'status-text'; statusText.textContent = 'Загрузка на сервер...';
+            progressFill.style.width = '20%'; actions.innerHTML = '';
+            errorDetail.style.display = 'none'; errorDetail.textContent = '';
+            document.getElementById('footerError').textContent = '';
 
             const formData = new FormData();
             formData.append('file', file);
@@ -437,15 +216,11 @@
                         statusText.textContent = 'ИИ анализирует аудио...';
                         progressFill.style.width = '45%';
                         pollStatus(data.job_id);
-                    } else {
-                        throw new Error('Нет job_id');
-                    }
+                    } else throw new Error('Нет job_id');
                 })
                 .catch(err => {
-                    statusIcon.className = 'status-icon error';
-                    statusIcon.textContent = '✕';
-                    statusText.className = 'status-text error';
-                    statusText.textContent = 'Ошибка загрузки';
+                    statusIcon.className = 'status-icon error'; statusIcon.textContent = '✕';
+                    statusText.className = 'status-text error'; statusText.textContent = 'Ошибка загрузки';
                     progressFill.style.width = '0%';
                 });
         }
@@ -458,25 +233,21 @@
                     .then(data => {
                         if (data.status === 'completed') {
                             clearInterval(pollInterval);
-                            statusIcon.className = 'status-icon success';
-                            statusIcon.textContent = '✓';
-                            statusText.className = 'status-text success';
-                            statusText.textContent = 'Готово!';
+                            statusIcon.className = 'status-icon success'; statusIcon.textContent = '✓';
+                            statusText.className = 'status-text success'; statusText.textContent = 'Готово!';
                             progressFill.style.width = '100%';
                             actions.innerHTML = `<a href="${API_URL}/download/${jobId}.pdf" class="btn" download>📄 Скачать ноты (PDF)</a>`;
                         } else if (data.status === 'failed') {
                             clearInterval(pollInterval);
-                            statusIcon.className = 'status-icon error';
-                            statusIcon.textContent = '✕';
-                            statusText.className = 'status-text error';
-                            const errMsg = data.error ? data.error.substring(0, 80) + '...' : 'Ошибка обработки';
-                            statusText.textContent = '❌ ' + errMsg;
+                            statusIcon.className = 'status-icon error'; statusIcon.textContent = '✕';
+                            statusText.className = 'status-text error'; statusText.textContent = 'Ошибка обработки';
                             progressFill.style.width = '0%';
-                            const footerErr = document.getElementById('footerError');
-                            if (footerErr) footerErr.textContent = '';
+                            const err = data.error || 'Неизвестная ошибка';
+                            errorDetail.textContent = err.substring(0, 120);
+                            errorDetail.style.display = 'block';
+                            document.getElementById('footerError').textContent = err.substring(0, 60);
                         } else {
-                            const w = 45 + Math.random() * 40;
-                            progressFill.style.width = w + '%';
+                            progressFill.style.width = (45 + Math.random() * 40) + '%';
                         }
                     });
             }, 3000);
