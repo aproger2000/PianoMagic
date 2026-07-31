@@ -272,6 +272,12 @@
             animation: pulse 2s infinite;
         }
 
+        .version-pill .err-msg {
+            color: var(--error);
+            font-size: 11px;
+            margin-left: 8px;
+        }
+
         .version-pill .dot.offline {
             background: var(--error);
             animation: none;
@@ -343,15 +349,16 @@
         </div>
     </div>
 
-    <div class="footer">
-        <div class="version-pill">
-            <span class="dot" id="beDot"></span>
-            <span>FE <strong id="feVersion">—</strong></span>
-            <span style="opacity:0.3">|</span>
-            <span>BE <strong id="beVersion">—</strong></span>
-        </div>
-        <div class="build-time" id="buildTime"></div>
+<div class="footer">
+    <div class="version-pill">
+        <span class="dot" id="beDot"></span>
+        <span>FE <strong id="feVersion">—</strong></span>
+        <span style="opacity:0.3">|</span>
+        <span>BE <strong id="beVersion">—</strong></span>
+        <span class="err-msg" id="footerError"></span>
     </div>
+    <div class="build-time" id="buildTime"></div>
+</div>
 
     <script>
         const API_URL = 'https://pianomagic-api.onrender.com';
@@ -366,10 +373,12 @@
             .then(data => {
                 document.getElementById('beVersion').textContent = data.version || '?';
             })
-            .catch(() => {
-                document.getElementById('beVersion').textContent = 'offline';
-                document.getElementById('beDot').classList.add('offline');
-            });
+        .catch(() => {
+            document.getElementById('beVersion').textContent = 'offline';
+            document.getElementById('beDot').classList.add('offline');
+            const footerErr = document.getElementById('footerError');
+            if (footerErr) footerErr.textContent = 'Backend offline';
+        });
 
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
@@ -460,8 +469,11 @@
                             statusIcon.className = 'status-icon error';
                             statusIcon.textContent = '✕';
                             statusText.className = 'status-text error';
-                            statusText.textContent = 'Ошибка обработки';
+                            const errMsg = data.error ? data.error.substring(0, 80) + '...' : 'Ошибка обработки';
+                            statusText.textContent = '❌ ' + errMsg;
                             progressFill.style.width = '0%';
+                            const footerErr = document.getElementById('footerError');
+                            if (footerErr) footerErr.textContent = '';
                         } else {
                             const w = 45 + Math.random() * 40;
                             progressFill.style.width = w + '%';
