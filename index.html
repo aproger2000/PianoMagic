@@ -81,6 +81,38 @@
         }
         .error { color: #ff6b8a; }
         .success { color: #00d4aa; }
+
+        /* Подвал с версиями */
+        .footer {
+            margin-top: auto;
+            padding-top: 40px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #606080;
+            width: 100%;
+            max-width: 480px;
+        }
+        .footer .version-row {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+        .footer .version-row span {
+            background: rgba(255,255,255,0.05);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+        .footer .version-row .label { color: #8080a0; }
+        .footer .version-row .value { color: #00d4aa; }
+        .footer .version-row .value.err { color: #ff6b8a; }
+        .footer .cache-hint {
+            margin-top: 8px;
+            font-size: 0.7rem;
+            color: #505070;
+        }
     </style>
 </head>
 <body>
@@ -102,8 +134,37 @@
         <div id="actions"></div>
     </div>
 
+    <!-- Подвал с версиями -->
+    <div class="footer" id="footer">
+        <div class="version-row">
+            <span><span class="label">Frontend:</span> <span class="value" id="feVersion">—</span></span>
+            <span><span class="label">Backend:</span> <span class="value" id="beVersion">—</span></span>
+        </div>
+        <div class="cache-hint" id="cacheHint"></div>
+    </div>
+
     <script>
         const API_URL = 'https://pianomagic-api.onrender.com';
+        const FE_VERSION = '3.0.3'; // Меняй при каждом обновлении index.html
+
+        // Показываем версию фронтенда сразу
+        document.getElementById('feVersion').textContent = FE_VERSION;
+
+        // Запрашиваем версию бэкенда
+        fetch(`${API_URL}/`)
+            .then(r => r.ok ? r.json() : Promise.reject(r.status))
+            .then(data => {
+                document.getElementById('beVersion').textContent = data.version || 'unknown';
+            })
+            .catch(err => {
+                document.getElementById('beVersion').textContent = 'offline';
+                document.getElementById('beVersion').classList.add('err');
+            });
+
+        // Показываем подсказку про кэш
+        document.getElementById('cacheHint').textContent = 
+            `Build: ${new Date().toISOString().slice(0,19).replace('T',' ')} UTC`;
+
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
         const status = document.getElementById('status');
