@@ -1,260 +1,337 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PianoMagic</title>
-    <style>
-        :root {
-            --bg: #F5F5F7;
-            --card: #FFFFFF;
-            --text: #1D1D1F;
-            --text-secondary: #86868B;
-            --accent: #007AFF;
-            --success: #34C759;
-            --error: #FF3B30;
-            --border: rgba(0,0,0,0.08);
-            --shadow: 0 4px 24px rgba(0,0,0,0.08);
-            --shadow-lg: 0 12px 48px rgba(0,0,0,0.12);
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: var(--bg); color: var(--text); min-height: 100vh;
-            display: flex; flex-direction: column; align-items: center;
-            padding: 48px 20px 32px; -webkit-font-smoothing: antialiased;
-        }
-        .logo-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; margin-bottom: 40px; }
-        .logo-svg { width: 72px; height: 72px; filter: drop-shadow(0 4px 12px rgba(0,122,255,0.25)); }
-        .brand { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
-        .tagline { font-size: 15px; color: var(--text-secondary); font-weight: 400; margin-top: -10px; }
-        .card {
-            width: 100%; max-width: 440px; background: var(--card);
-            border-radius: 24px; box-shadow: var(--shadow); padding: 32px;
-            transition: box-shadow 0.3s ease;
-        }
-        .card:hover { box-shadow: var(--shadow-lg); }
-        .drop-zone {
-            width: 100%; height: 200px; border: 2px dashed var(--border); border-radius: 20px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
-            cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1); background: var(--bg);
-        }
-        .drop-zone:hover { border-color: var(--accent); background: rgba(0,122,255,0.04); }
-        .drop-zone.dragover { border-color: var(--accent); background: rgba(0,122,255,0.08); transform: scale(0.98); }
-        .drop-zone input { display: none; }
-        .drop-icon {
-            width: 56px; height: 56px; background: linear-gradient(135deg, var(--accent), #5856D6);
-            border-radius: 16px; display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 24px; box-shadow: 0 4px 12px rgba(0,122,255,0.3);
-        }
-        .drop-title { font-size: 17px; font-weight: 600; }
-        .drop-hint { font-size: 13px; color: var(--text-secondary); }
-        .status { margin-top: 24px; display: none; flex-direction: column; gap: 16px; }
-        .status.active { display: flex; }
-        .status-header { display: flex; align-items: center; gap: 12px; }
-        .status-icon {
-            width: 32px; height: 32px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 14px; flex-shrink: 0;
-        }
-        .status-icon.processing { background: rgba(0,122,255,0.1); color: var(--accent); }
-        .status-icon.success { background: rgba(52,199,89,0.1); color: var(--success); }
-        .status-icon.error { background: rgba(255,59,48,0.1); color: var(--error); }
-        .status-text { font-size: 15px; font-weight: 500; }
-        .status-text.error { color: var(--error); }
-        .status-text.success { color: var(--success); }
-        .error-detail {
-            font-size: 12px; color: var(--error); opacity: 0.85;
-            background: rgba(255,59,48,0.06); padding: 8px 12px;
-            border-radius: 8px; font-family: "SF Mono", monospace; word-break: break-all;
-        }
-        .progress-track { width: 100%; height: 4px; background: rgba(0,0,0,0.06); border-radius: 2px; overflow: hidden; }
-        .progress-fill {
-            height: 100%; background: linear-gradient(90deg, var(--accent), #5856D6);
-            border-radius: 2px; width: 0%;
-            transition: width 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
-        }
-        .btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            width: 100%; padding: 16px;
-            background: linear-gradient(135deg, var(--accent), #5856D6);
-            color: white; border: none; border-radius: 16px;
-            font-size: 16px; font-weight: 600; font-family: inherit;
-            cursor: pointer; text-decoration: none; transition: all 0.2s ease;
-            box-shadow: 0 4px 16px rgba(0,122,255,0.3);
-        }
-        .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,122,255,0.4); }
-        .footer { margin-top: auto; padding-top: 40px; text-align: center; width: 100%; max-width: 440px; }
-        .version-pill {
-            display: inline-flex; align-items: center; gap: 12px;
-            background: var(--card); padding: 8px 16px; border-radius: 100px;
-            box-shadow: var(--shadow); font-size: 12px; color: var(--text-secondary);
-            font-family: "SF Mono", SFMono-Regular, ui-monospace, monospace; flex-wrap: wrap; justify-content: center;
-        }
-        .version-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); animation: pulse 2s infinite; }
-        .version-pill .dot.offline { background: var(--error); animation: none; }
-        .version-pill .err-msg { color: var(--error); font-size: 11px; margin-left: 4px; }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
-        .build-time { margin-top: 8px; font-size: 11px; color: var(--text-secondary); opacity: 0.6; }
-        @media (max-width: 480px) {
-            body { padding: 32px 16px 24px; }
-            .card { padding: 24px; border-radius: 20px; }
-            .brand { font-size: 24px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PianoMagic v4</title>
+<style>
+:root {
+    --bg: #F5F5F7; --card: #FFFFFF; --text: #1D1D1F;
+    --text2: #86868B; --accent: #007AFF; --accent2: #5856D6;
+    --success: #34C759; --error: #FF3B30; --border: rgba(0,0,0,0.08);
+    --shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    padding: 32px 16px; -webkit-font-smoothing: antialiased;
+}
+.logo-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 32px; }
+.logo-svg { width: 64px; height: 64px; filter: drop-shadow(0 4px 12px rgba(0,122,255,0.25)); }
+.brand { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+.tagline { font-size: 14px; color: var(--text2); margin-top: -8px; }
+
+.card {
+    width: 100%; max-width: 480px; background: var(--card);
+    border-radius: 20px; box-shadow: var(--shadow); padding: 24px;
+    margin-bottom: 16px;
+}
+.drop-zone {
+    width: 100%; height: 160px; border: 2px dashed var(--border); border-radius: 16px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    cursor: pointer; transition: all 0.3s ease; background: var(--bg);
+}
+.drop-zone:hover { border-color: var(--accent); background: rgba(0,122,255,0.04); }
+.drop-zone input { display: none; }
+.drop-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; }
+.drop-title { font-size: 16px; font-weight: 600; }
+.drop-hint { font-size: 12px; color: var(--text2); }
+
+.visuals { display: none; margin-top: 20px; }
+.visuals.active { display: block; }
+.vis-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+
+#spectrogram { width: 100%; height: 160px; background: #000; border-radius: 12px; margin-bottom: 16px; }
+#staff { width: 100%; height: 140px; background: var(--bg); border-radius: 12px; margin-bottom: 16px; border: 1px solid var(--border); }
+
+.controls { display: flex; gap: 8px; margin-top: 16px; }
+.btn {
+    flex: 1; padding: 14px; border: none; border-radius: 12px;
+    font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer;
+    transition: all 0.2s ease; text-align: center;
+}
+.btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white; box-shadow: 0 4px 12px rgba(0,122,255,0.3);
+}
+.btn-primary:hover { transform: translateY(-1px); }
+.btn-secondary {
+    background: var(--bg); color: var(--text); border: 1px solid var(--border);
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+.footer {
+    margin-top: auto; padding-top: 32px; text-align: center; width: 100%; max-width: 480px;
+}
+.version-pill {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--card); padding: 6px 14px; border-radius: 100px;
+    box-shadow: var(--shadow); font-size: 11px; color: var(--text2);
+    font-family: "SF Mono", monospace;
+}
+</style>
 </head>
 <body>
 
-    <div class="logo-wrap">
-        <svg class="logo-svg" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="72" height="72" rx="18" fill="url(#logoGrad)"/>
-            <rect x="22" y="20" width="8" height="36" rx="2" fill="white" fill-opacity="0.95"/>
-            <rect x="42" y="24" width="8" height="32" rx="2" fill="white" fill-opacity="0.6"/>
-            <circle cx="50" cy="18" r="5" fill="white"/>
-            <defs>
-                <linearGradient id="logoGrad" x1="0" y1="0" x2="72" y2="72" gradientUnits="userSpaceOnUse">
-                    <stop stop-color="#007AFF"/><stop offset="1" stop-color="#5856D6"/>
-                </linearGradient>
-            </defs>
-        </svg>
-        <div class="brand">PianoMagic</div>
-        <div class="tagline">Аудио → Ноты</div>
+<div class="logo-wrap">
+    <svg class="logo-svg" viewBox="0 0 64 64" fill="none">
+        <rect width="64" height="64" rx="16" fill="url(#lg)"/>
+        <rect x="20" y="18" width="7" height="32" rx="2" fill="white" opacity="0.95"/>
+        <rect x="37" y="22" width="7" height="28" rx="2" fill="white" opacity="0.6"/>
+        <circle cx="44" cy="16" r="4" fill="white"/>
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="64" y2="64"><stop stop-color="#007AFF"/><stop offset="1" stop-color="#5856D6"/></linearGradient></defs>
+    </svg>
+    <div class="brand">PianoMagic</div>
+    <div class="tagline">FFT → Мелодия → Ноты</div>
+</div>
+
+<div class="card">
+    <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" accept="audio/*">
+        <div class="drop-icon">🎵</div>
+        <div class="drop-title">Загрузите аудиофайл</div>
+        <div class="drop-hint">MP3 · WAV · FLAC · M4A</div>
     </div>
 
-<div class="drop-zone" id="dropZone">
-    <input type="file" id="fileInput" 
-           accept="audio/mpeg,audio/mp3,audio/wav,audio/x-wav,audio/flac,audio/mp4,audio/x-m4a,audio/ogg,.mp3,.wav,.flac,.m4a,.ogg">
-    <div class="drop-icon">🎵</div>
-    <div class="drop-title">Выберите аудиофайл</div>
-    <div class="drop-hint">MP3 · WAV · FLAC · M4A · OGG</div>
-    <div class="drop-hint" style="font-size: 11px; margin-top: 4px; opacity: 0.7;">
-        📱 iPhone: нажмите и выберите файл в приложении «Файлы»
+    <div class="visuals" id="visuals">
+        <div class="vis-title">Спектрограмма (FFT, 50мс фреймы)</div>
+        <canvas id="spectrogram"></canvas>
+
+        <div class="vis-title">Извлечённая мелодия</div>
+        <svg id="staff" viewBox="0 0 400 120" preserveAspectRatio="none"></svg>
+
+        <div class="controls">
+            <button class="btn btn-secondary" id="btnPlay">▶️ Прослушать</button>
+            <button class="btn btn-primary" id="btnRender" disabled>📄 Скачать PDF</button>
+        </div>
     </div>
 </div>
 
-        <div class="status" id="status">
-            <div class="status-header">
-                <div class="status-icon processing" id="statusIcon">⟳</div>
-                <div class="status-text" id="statusText">Загрузка на сервер...</div>
-            </div>
-            <div class="progress-track" id="progressTrack">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-            <div id="actions"></div>
-            <div class="error-detail" id="errorDetail" style="display:none;"></div>
-        </div>
+<div class="footer">
+    <div class="version-pill">
+        <span>FE <strong>4.0.0</strong></span>
+        <span style="opacity:0.3">|</span>
+        <span>BE <strong id="beVer">—</strong></span>
     </div>
+</div>
 
-    <div class="footer">
-        <div class="version-pill">
-            <span class="dot" id="beDot"></span>
-            <span>FE <strong id="feVersion">—</strong></span>
-            <span style="opacity:0.3">|</span>
-            <span>BE <strong id="beVersion">—</strong></span>
-            <span class="err-msg" id="footerError"></span>
-        </div>
-        <div class="build-time" id="buildTime"></div>
-    </div>
+<script>
+const API = 'https://pianomagic-api.onrender.com';
+let currentJobId = null;
+let melodyData = null;
+let fftData = null;
+let audioCtx = null;
 
-    <script>
-        const API_URL = 'https://pianomagic-api.onrender.com';
-        const FE_VERSION = '3.7.0';
+fetch(`${API}/`).then(r => r.ok ? r.json() : null).then(d => {
+    if (d) document.getElementById('beVer').textContent = d.version;
+});
 
-        document.getElementById('feVersion').textContent = FE_VERSION;
-        document.getElementById('buildTime').textContent =
-            'Build: ' + new Date().toISOString().slice(0, 19).replace('T', ' ') + ' UTC';
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const visuals = document.getElementById('visuals');
+const btnPlay = document.getElementById('btnPlay');
+const btnRender = document.getElementById('btnRender');
 
-        fetch(`${API_URL}/`)
-            .then(r => r.ok ? r.json() : Promise.reject())
+dropZone.addEventListener('click', () => fileInput.click());
+['dragover','dragenter'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.style.borderColor = 'var(--accent)'; }));
+['dragleave','drop'].forEach(e => dropZone.addEventListener(e, ev => {
+    ev.preventDefault(); dropZone.style.borderColor = '';
+    if (e === 'drop' && ev.dataTransfer.files.length) handleFile(ev.dataTransfer.files[0]);
+}));
+fileInput.addEventListener('change', e => { if (e.target.files.length) handleFile(e.target.files[0]); });
+
+function handleFile(file) {
+    const valid = /\.(mp3|wav|flac|m4a|ogg)$/i.test(file.name);
+    if (!valid) { alert('Выберите аудиофайл'); return; }
+
+    visuals.classList.remove('active');
+    btnRender.disabled = true;
+    btnPlay.textContent = '▶️ Прослушать';
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    fetch(`${API}/analyze`, { method: 'POST', body: formData })
+        .then(r => r.json())
+        .then(data => {
+            if (data.job_id) {
+                currentJobId = data.job_id;
+                pollStatus(data.job_id);
+            }
+        })
+        .catch(err => alert('Ошибка загрузки: ' + err.message));
+}
+
+function pollStatus(jobId) {
+    const iv = setInterval(() => {
+        fetch(`${API}/status/${jobId}`)
+            .then(r => r.json())
             .then(data => {
-                document.getElementById('beVersion').textContent = data.version || '?';
-            })
-            .catch(() => {
-                document.getElementById('beVersion').textContent = 'offline';
-                document.getElementById('beDot').classList.add('offline');
-                document.getElementById('footerError').textContent = 'Backend offline';
+                if (data.status === 'analyzed') {
+                    clearInterval(iv);
+                    loadMelody(jobId);
+                } else if (data.status === 'failed') {
+                    clearInterval(iv);
+                    alert('Ошибка анализа: ' + (data.error || 'unknown'));
+                }
             });
+    }, 2000);
+}
 
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
-        const status = document.getElementById('status');
-        const statusIcon = document.getElementById('statusIcon');
-        const statusText = document.getElementById('statusText');
-        const progressFill = document.getElementById('progressFill');
-        const actions = document.getElementById('actions');
-        const errorDetail = document.getElementById('errorDetail');
-        let pollInterval;
-
-        dropZone.addEventListener('click', () => fileInput.click());
-
-        ['dragover', 'dragenter'].forEach(evt => {
-            dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+function loadMelody(jobId) {
+    fetch(`${API}/melody/${jobId}`)
+        .then(r => r.json())
+        .then(data => {
+            melodyData = data.melody;
+            fftData = data.fft;
+            visuals.classList.add('active');
+            drawSpectrogram(fftData);
+            drawStaff(melodyData);
+            btnRender.disabled = false;
         });
-        ['dragleave', 'drop'].forEach(evt => {
-            dropZone.addEventListener(evt, e => {
-                e.preventDefault(); dropZone.classList.remove('dragover');
-                if (evt === 'drop' && e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
-            });
+}
+
+function drawSpectrogram(frames) {
+    const canvas = document.getElementById('spectrogram');
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const w = canvas.clientWidth;
+    const h = canvas.clientHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    ctx.scale(dpr, dpr);
+
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, w, h);
+
+    if (!frames || frames.length === 0) return;
+
+    const barW = w / frames.length;
+    frames.forEach((f, i) => {
+        const amp = f.amp || 0;
+        const hue = 200 + amp * 160;
+        const lightness = amp * 60;
+        ctx.fillStyle = `hsl(${hue}, 80%, ${lightness}%)`;
+        const bh = amp * h * 0.9;
+        ctx.fillRect(i * barW, h - bh, Math.max(1, barW - 0.5), bh);
+    });
+}
+
+function drawStaff(notes) {
+    const svg = document.getElementById('staff');
+    svg.innerHTML = '';
+    const w = 400, h = 120;
+    const lineY = [30, 40, 50, 60, 70];
+
+    // 5 линеек
+    lineY.forEach(y => {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', '0'); line.setAttribute('y1', y);
+        line.setAttribute('x2', w); line.setAttribute('y2', y);
+        line.setAttribute('stroke', '#1D1D1F'); line.setAttribute('stroke-width', '0.8');
+        svg.appendChild(line);
+    });
+
+    if (!notes || notes.length === 0) return;
+
+    // Скрипичный ключ
+    const clef = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    clef.setAttribute('x', '8'); clef.setAttribute('y', '58');
+    clef.setAttribute('font-size', '28'); clef.setAttribute('font-family', 'serif');
+    clef.textContent = '𝄞';
+    svg.appendChild(clef);
+
+    const minP = Math.min(...notes.map(n => n.pitch));
+    const maxP = Math.max(...notes.map(n => n.pitch));
+    const range = Math.max(1, maxP - minP);
+    const xStep = (w - 40) / (notes.length + 1);
+
+    notes.forEach((n, i) => {
+        const x = 35 + i * xStep;
+        const norm = (n.pitch - minP) / range;
+        const y = 70 - norm * 40;
+
+        // Овал ноты
+        const note = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+        note.setAttribute('cx', x); note.setAttribute('cy', y);
+        note.setAttribute('rx', '5'); note.setAttribute('ry', '4');
+        note.setAttribute('fill', '#1D1D1F');
+        svg.appendChild(note);
+
+        // Штиль
+        const stem = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        stem.setAttribute('x1', x + 4); stem.setAttribute('y1', y);
+        stem.setAttribute('x2', x + 4); stem.setAttribute('y2', y - 25);
+        stem.setAttribute('stroke', '#1D1D1F'); stem.setAttribute('stroke-width', '1');
+        svg.appendChild(stem);
+    });
+}
+
+function playMelody() {
+    if (!melodyData || melodyData.length === 0) return;
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    const now = audioCtx.currentTime;
+    let t = now;
+
+    melodyData.forEach(n => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const freq = 440 * Math.pow(2, (n.pitch - 69) / 12);
+
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.3, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + n.dur);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(t);
+        osc.stop(t + n.dur);
+
+        t += n.dur;
+    });
+
+    btnPlay.textContent = '⏸️ Остановить';
+    setTimeout(() => {
+        btnPlay.textContent = '▶️ Прослушать';
+    }, (t - now) * 1000);
+}
+
+btnPlay.addEventListener('click', () => {
+    if (audioCtx && audioCtx.state === 'running') {
+        audioCtx.suspend();
+        btnPlay.textContent = '▶️ Прослушать';
+    } else {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        audioCtx.resume();
+        playMelody();
+    }
+});
+
+btnRender.addEventListener('click', () => {
+    if (!currentJobId) return;
+    btnRender.disabled = true;
+    btnRender.textContent = '⏳ Рендер...';
+
+    fetch(`${API}/render/${currentJobId}`, { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+            if (data.status === 'completed') {
+                window.location.href = `${API}/download/${currentJobId}.pdf`;
+                btnRender.textContent = '📄 Скачать PDF';
+                btnRender.disabled = false;
+            } else {
+                throw new Error('Render failed');
+            }
+        })
+        .catch(err => {
+            alert('Ошибка рендера: ' + err.message);
+            btnRender.textContent = '📄 Скачать PDF';
+            btnRender.disabled = false;
         });
-        fileInput.addEventListener('change', e => { if (e.target.files.length) handleFile(e.target.files[0]); });
-
-        function handleFile(file) {
-            const valid = /\.(mp3|wav|flac|m4a|ogg)$/i.test(file.name) || file.type.startsWith('audio/');
-            if (!valid) { alert('Выберите аудиофайл (MP3, WAV, FLAC, M4A, OGG)'); return; }
-
-            status.classList.add('active');
-            statusIcon.className = 'status-icon processing'; statusIcon.textContent = '⟳';
-            statusText.className = 'status-text'; statusText.textContent = 'Загрузка на сервер...';
-            progressFill.style.width = '20%'; actions.innerHTML = '';
-            errorDetail.style.display = 'none'; errorDetail.textContent = '';
-            document.getElementById('footerError').textContent = '';
-
-            const formData = new FormData();
-            formData.append('file', file);
-
-            fetch(`${API_URL}/transcribe/file`, { method: 'POST', body: formData })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.job_id) {
-                        statusText.textContent = 'ИИ анализирует аудио...';
-                        progressFill.style.width = '45%';
-                        pollStatus(data.job_id);
-                    } else throw new Error('Нет job_id');
-                })
-                .catch(err => {
-                    statusIcon.className = 'status-icon error'; statusIcon.textContent = '✕';
-                    statusText.className = 'status-text error'; statusText.textContent = 'Ошибка загрузки';
-                    progressFill.style.width = '0%';
-                });
-        }
-
-        function pollStatus(jobId) {
-            if (pollInterval) clearInterval(pollInterval);
-            pollInterval = setInterval(() => {
-                fetch(`${API_URL}/status/${jobId}`)
-                    .then(r => r.json())
-                    .then(data => {
-                        if (data.status === 'completed') {
-                            clearInterval(pollInterval);
-                            statusIcon.className = 'status-icon success'; statusIcon.textContent = '✓';
-                            statusText.className = 'status-text success'; statusText.textContent = 'Готово!';
-                            progressFill.style.width = '100%';
-                            actions.innerHTML = `<a href="${API_URL}/download/${jobId}.pdf" class="btn" download>📄 Скачать ноты (PDF)</a>`;
-                        } else if (data.status === 'failed') {
-                            clearInterval(pollInterval);
-                            statusIcon.className = 'status-icon error'; statusIcon.textContent = '✕';
-                            statusText.className = 'status-text error'; statusText.textContent = 'Ошибка обработки';
-                            progressFill.style.width = '0%';
-                            const err = data.error || 'Неизвестная ошибка';
-                            errorDetail.textContent = err.substring(0, 120);
-                            errorDetail.style.display = 'block';
-                            document.getElementById('footerError').textContent = err.substring(0, 60);
-                        } else {
-                            progressFill.style.width = (45 + Math.random() * 40) + '%';
-                        }
-                    });
-            }, 3000);
-        }
-    </script>
+});
+</script>
 </body>
 </html>
