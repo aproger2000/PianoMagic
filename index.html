@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PianoMagic v4</title>
+<title>PianoMagic v4.1</title>
 <style>
 :root {
     --bg: #F5F5F7; --card: #FFFFFF; --text: #1D1D1F;
@@ -39,12 +39,33 @@ body {
 .drop-title { font-size: 16px; font-weight: 600; }
 .drop-hint { font-size: 12px; color: var(--text2); }
 
+/* Progress */
+.progress-area {
+    display: none; margin-top: 20px;
+}
+.progress-area.active { display: block; }
+.progress-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+}
+.progress-label { font-size: 14px; font-weight: 500; color: var(--text); }
+.progress-percent { font-size: 13px; font-weight: 600; color: var(--accent); font-family: "SF Mono", monospace; }
+.progress-track {
+    width: 100%; height: 6px; background: rgba(0,0,0,0.06);
+    border-radius: 3px; overflow: hidden;
+}
+.progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 3px; width: 0%;
+    transition: width 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
 .visuals { display: none; margin-top: 20px; }
 .visuals.active { display: block; }
 .vis-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
 
-#spectrogram { width: 100%; height: 160px; background: #000; border-radius: 12px; margin-bottom: 16px; }
-#staff { width: 100%; height: 140px; background: var(--bg); border-radius: 12px; margin-bottom: 16px; border: 1px solid var(--border); }
+#spectrogram { width: 100%; height: 160px; background: #0a0a1a; border-radius: 12px; margin-bottom: 16px; }
+#staff { width: 100%; height: 180px; background: var(--bg); border-radius: 12px; margin-bottom: 16px; border: 1px solid var(--border); }
 
 .controls { display: flex; gap: 8px; margin-top: 16px; }
 .btn {
@@ -95,12 +116,24 @@ body {
         <div class="drop-hint">MP3 · WAV · FLAC · M4A</div>
     </div>
 
+    <!-- Прогресс -->
+    <div class="progress-area" id="progressArea">
+        <div class="progress-header">
+            <span class="progress-label" id="progressLabel">Загрузка...</span>
+            <span class="progress-percent" id="progressPercent">0%</span>
+        </div>
+        <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <!-- Визуализация -->
     <div class="visuals" id="visuals">
-        <div class="vis-title">Спектрограмма (FFT, 50мс фреймы)</div>
+        <div class="vis-title">Спектрограмма (FFT, 50мс)</div>
         <canvas id="spectrogram"></canvas>
 
         <div class="vis-title">Извлечённая мелодия</div>
-        <svg id="staff" viewBox="0 0 400 120" preserveAspectRatio="none"></svg>
+        <svg id="staff" viewBox="0 0 800 180" preserveAspectRatio="xMidYMid meet"></svg>
 
         <div class="controls">
             <button class="btn btn-secondary" id="btnPlay">▶️ Прослушать</button>
@@ -111,7 +144,7 @@ body {
 
 <div class="footer">
     <div class="version-pill">
-        <span>FE <strong>4.0.0</strong></span>
+        <span>FE <strong>4.1.1</strong></span>
         <span style="opacity:0.3">|</span>
         <span>BE <strong id="beVer">—</strong></span>
     </div>
@@ -130,9 +163,24 @@ fetch(`${API}/`).then(r => r.ok ? r.json() : null).then(d => {
 
 const dropZone = document.getElementById('dropZone');
 const fileInput = document.getElementById('fileInput');
+const progressArea = document.getElementById('progressArea');
+const progressLabel = document.getElementById('progressLabel');
+const progressPercent = document.getElementById('progressPercent');
+const progressFill = document.getElementById('progressFill');
 const visuals = document.getElementById('visuals');
 const btnPlay = document.getElementById('btnPlay');
 const btnRender = document.getElementById('btnRender');
+
+function setProgress(text, percent) {
+    progressLabel.textContent = text;
+    progressPercent.textContent = percent + '%';
+    progressFill.style.width = percent + '%';
+    progressArea.classList.add('active');
+}
+
+function hideProgress() {
+    progressArea.classList.remove('active');
+}
 
 dropZone.addEventListener('click', () => fileInput.click());
 ['dragover','dragenter'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.style.borderColor = 'var(--accent)'; }));
@@ -149,6 +197,7 @@ function handleFile(file) {
     visuals.classList.remove('active');
     btnRender.disabled = true;
     btnPlay.textContent = '▶️ Прослушать';
+    setProgress('Загрузка файла...', 5);
 
     const formData = new FormData();
     formData.append('file', file);
@@ -161,7 +210,10 @@ function handleFile(file) {
                 pollStatus(data.job_id);
             }
         })
-        .catch(err => alert('Ошибка загрузки: ' + err.message));
+        .catch(err => {
+            setProgress('Ошибка загрузки', 0);
+            alert('Ошибка загрузки: ' + err.message);
+        });
 }
 
 function pollStatus(jobId) {
@@ -169,15 +221,18 @@ function pollStatus(jobId) {
         fetch(`${API}/status/${jobId}`)
             .then(r => r.json())
             .then(data => {
+                setProgress(data.stage_text || 'Обработка...', data.progress || 0);
+
                 if (data.status === 'analyzed') {
                     clearInterval(iv);
+                    hideProgress();
                     loadMelody(jobId);
                 } else if (data.status === 'failed') {
                     clearInterval(iv);
-                    alert('Ошибка анализа: ' + (data.error || 'unknown'));
+                    setProgress('Ошибка: ' + (data.error || 'unknown'), 0);
                 }
             });
-    }, 2000);
+    }, 1500);
 }
 
 function loadMelody(jobId) {
@@ -202,18 +257,18 @@ function drawSpectrogram(frames) {
     canvas.width = w * dpr; canvas.height = h * dpr;
     ctx.scale(dpr, dpr);
 
-    ctx.fillStyle = '#000';
+    ctx.fillStyle = '#0a0a1a';
     ctx.fillRect(0, 0, w, h);
 
     if (!frames || frames.length === 0) return;
 
     const barW = w / frames.length;
     frames.forEach((f, i) => {
-        const amp = f.amp || 0;
-        const hue = 200 + amp * 160;
-        const lightness = amp * 60;
-        ctx.fillStyle = `hsl(${hue}, 80%, ${lightness}%)`;
-        const bh = amp * h * 0.9;
+        const amp = Math.max(0, Math.min(1, f.amp || 0));
+        const bright = Math.pow(amp, 0.5) * 100;
+        const hue = 200 + amp * 60;
+        ctx.fillStyle = `hsl(${hue}, 90%, ${bright}%)`;
+        const bh = Math.max(2, amp * h * 0.9);
         ctx.fillRect(i * barW, h - bh, Math.max(1, barW - 0.5), bh);
     });
 }
@@ -221,50 +276,68 @@ function drawSpectrogram(frames) {
 function drawStaff(notes) {
     const svg = document.getElementById('staff');
     svg.innerHTML = '';
-    const w = 400, h = 120;
-    const lineY = [30, 40, 50, 60, 70];
+    const w = 800, h = 180;
+    const lineY = [50, 65, 80, 95, 110];
 
-    // 5 линеек
     lineY.forEach(y => {
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', '0'); line.setAttribute('y1', y);
-        line.setAttribute('x2', w); line.setAttribute('y2', y);
-        line.setAttribute('stroke', '#1D1D1F'); line.setAttribute('stroke-width', '0.8');
+        line.setAttribute('x1', '60'); line.setAttribute('y1', y);
+        line.setAttribute('x2', w - 10); line.setAttribute('y2', y);
+        line.setAttribute('stroke', '#1D1D1F'); line.setAttribute('stroke-width', '1.2');
         svg.appendChild(line);
     });
 
-    if (!notes || notes.length === 0) return;
-
-    // Скрипичный ключ
     const clef = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    clef.setAttribute('x', '8'); clef.setAttribute('y', '58');
-    clef.setAttribute('font-size', '28'); clef.setAttribute('font-family', 'serif');
+    clef.setAttribute('x', '15'); clef.setAttribute('y', '95');
+    clef.setAttribute('font-size', '42'); clef.setAttribute('font-family', 'serif');
     clef.textContent = '𝄞';
     svg.appendChild(clef);
 
-    const minP = Math.min(...notes.map(n => n.pitch));
-    const maxP = Math.max(...notes.map(n => n.pitch));
-    const range = Math.max(1, maxP - minP);
-    const xStep = (w - 40) / (notes.length + 1);
+    if (!notes || notes.length === 0) return;
+
+    const totalTime = notes.reduce((s, n) => s + n.dur, 0) * 1.2;
+    const xScale = (w - 80) / Math.max(totalTime, 4);
+    let x = 70;
+
+    const midiToY = (midi) => 110 - (midi - 60) * 3.5;
 
     notes.forEach((n, i) => {
-        const x = 35 + i * xStep;
-        const norm = (n.pitch - minP) / range;
-        const y = 70 - norm * 40;
+        const y = midiToY(n.pitch);
+        const noteW = Math.max(20, n.dur * xScale * 0.8);
 
-        // Овал ноты
         const note = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-        note.setAttribute('cx', x); note.setAttribute('cy', y);
-        note.setAttribute('rx', '5'); note.setAttribute('ry', '4');
+        note.setAttribute('cx', x + noteW / 2); note.setAttribute('cy', y);
+        note.setAttribute('rx', noteW / 2); note.setAttribute('ry', '5');
         note.setAttribute('fill', '#1D1D1F');
         svg.appendChild(note);
 
-        // Штиль
+        const stemDir = y > 80 ? -1 : 1;
         const stem = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        stem.setAttribute('x1', x + 4); stem.setAttribute('y1', y);
-        stem.setAttribute('x2', x + 4); stem.setAttribute('y2', y - 25);
-        stem.setAttribute('stroke', '#1D1D1F'); stem.setAttribute('stroke-width', '1');
+        stem.setAttribute('x1', x + noteW - 2); stem.setAttribute('y1', y);
+        stem.setAttribute('x2', x + noteW - 2); stem.setAttribute('y2', y + stemDir * 30);
+        stem.setAttribute('stroke', '#1D1D1F'); stem.setAttribute('stroke-width', '1.5');
         svg.appendChild(stem);
+
+        if (n.pitch >= 77) {
+            for (let ly = 50; ly > y; ly -= 15) {
+                const ll = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                ll.setAttribute('x1', x); ll.setAttribute('y1', ly);
+                ll.setAttribute('x2', x + noteW); ll.setAttribute('y2', ly);
+                ll.setAttribute('stroke', '#1D1D1F'); ll.setAttribute('stroke-width', '0.8');
+                svg.appendChild(ll);
+            }
+        }
+        if (n.pitch <= 56) {
+            for (let ly = 110; ly < y; ly += 15) {
+                const ll = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                ll.setAttribute('x1', x); ll.setAttribute('y1', ly);
+                ll.setAttribute('x2', x + noteW); ll.setAttribute('y2', ly);
+                ll.setAttribute('stroke', '#1D1D1F'); ll.setAttribute('stroke-width', '0.8');
+                svg.appendChild(ll);
+            }
+        }
+
+        x += noteW + 8;
     });
 }
 
@@ -282,8 +355,8 @@ function playMelody() {
 
         osc.type = 'sine';
         osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0.3, t);
-        gain.gain.exponentialRampToValueAtTime(0.01, t + n.dur);
+        gain.gain.setValueAtTime(0.25, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + n.dur * 0.9);
 
         osc.connect(gain);
         gain.connect(audioCtx.destination);
@@ -294,9 +367,7 @@ function playMelody() {
     });
 
     btnPlay.textContent = '⏸️ Остановить';
-    setTimeout(() => {
-        btnPlay.textContent = '▶️ Прослушать';
-    }, (t - now) * 1000);
+    setTimeout(() => { btnPlay.textContent = '▶️ Прослушать'; }, (t - now) * 1000);
 }
 
 btnPlay.addEventListener('click', () => {
