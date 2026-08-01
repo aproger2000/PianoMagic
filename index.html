@@ -3,94 +3,176 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PianoMagic v4.1</title>
+<title>PianoMagic v4.2</title>
 <style>
 :root {
-    --bg: #F5F5F7; --card: #FFFFFF; --text: #1D1D1F;
-    --text2: #86868B; --accent: #007AFF; --accent2: #5856D6;
-    --success: #34C759; --error: #FF3B30; --border: rgba(0,0,0,0.08);
-    --shadow: 0 4px 24px rgba(0,0,0,0.08);
+    --bg: #FFFFFF;
+    --bg-secondary: #F5F5F7;
+    --card: #FFFFFF;
+    --text: #1D1D1F;
+    --text2: #86868B;
+    --accent: #555555;
+    --accent-light: #8E8E93;
+    --success: #34C759;
+    --error: #FF3B30;
+    --warning: #FF9500;
+    --border: rgba(0,0,0,0.06);
+    --shadow: 0 2px 16px rgba(0,0,0,0.06);
+    --shadow-hover: 0 8px 32px rgba(0,0,0,0.10);
+    --metallic: linear-gradient(135deg, #E8E8ED 0%, #D1D1D6 50%, #E8E8ED 100%);
+    --metallic-dark: linear-gradient(135deg, #8E8E93 0%, #636366 50%, #48484A 100%);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
     background: var(--bg); color: var(--text);
     min-height: 100vh; display: flex; flex-direction: column; align-items: center;
-    padding: 32px 16px; -webkit-font-smoothing: antialiased;
+    padding: 40px 16px 24px; -webkit-font-smoothing: antialiased;
 }
-.logo-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 32px; }
-.logo-svg { width: 64px; height: 64px; filter: drop-shadow(0 4px 12px rgba(0,122,255,0.25)); }
-.brand { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
-.tagline { font-size: 14px; color: var(--text2); margin-top: -8px; }
 
+/* Logo */
+.logo-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 36px; }
+.logo-svg { width: 72px; height: 72px; filter: drop-shadow(0 6px 16px rgba(0,0,0,0.12)); }
+.brand { font-size: 28px; font-weight: 700; letter-spacing: -0.6px; color: var(--text); }
+.tagline { font-size: 13px; color: var(--text2); font-weight: 500; letter-spacing: 0.2px; margin-top: -4px; }
+
+/* Card */
 .card {
     width: 100%; max-width: 480px; background: var(--card);
-    border-radius: 20px; box-shadow: var(--shadow); padding: 24px;
-    margin-bottom: 16px;
+    border-radius: 24px; box-shadow: var(--shadow); padding: 28px;
+    margin-bottom: 16px; border: 1px solid var(--border);
+    transition: box-shadow 0.3s ease;
 }
+.card:hover { box-shadow: var(--shadow-hover); }
+
+/* Drop zone */
 .drop-zone {
-    width: 100%; height: 160px; border: 2px dashed var(--border); border-radius: 16px;
+    width: 100%; height: 170px; border: 2px dashed var(--border); border-radius: 20px;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
-    cursor: pointer; transition: all 0.3s ease; background: var(--bg);
+    cursor: pointer; transition: all 0.35s cubic-bezier(0.25, 0.1, 0.25, 1); background: var(--bg-secondary);
 }
-.drop-zone:hover { border-color: var(--accent); background: rgba(0,122,255,0.04); }
+.drop-zone:hover {
+    border-color: rgba(0,0,0,0.15);
+    background: linear-gradient(135deg, #F5F5F7, #ECECF0);
+    transform: scale(1.01);
+}
+.drop-zone.drag-active {
+    border-color: #636366;
+    background: linear-gradient(135deg, #ECECF0, #E0E0E5);
+}
 .drop-zone input { display: none; }
-.drop-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; }
-.drop-title { font-size: 16px; font-weight: 600; }
-.drop-hint { font-size: 12px; color: var(--text2); }
+.drop-icon {
+    width: 52px; height: 52px;
+    background: var(--metallic-dark);
+    border-radius: 14px; display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 22px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.drop-title { font-size: 16px; font-weight: 600; color: var(--text); }
+.drop-hint { font-size: 12px; color: var(--text2); font-weight: 500; }
 
 /* Progress */
-.progress-area {
-    display: none; margin-top: 20px;
-}
+.progress-area { display: none; margin-top: 24px; }
 .progress-area.active { display: block; }
 .progress-header {
     display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 .progress-label { font-size: 14px; font-weight: 500; color: var(--text); }
-.progress-percent { font-size: 13px; font-weight: 600; color: var(--accent); font-family: "SF Mono", monospace; }
+.progress-percent { font-size: 13px; font-weight: 600; color: var(--accent); font-family: "SF Mono", SFMono-Regular, monospace; }
 .progress-track {
-    width: 100%; height: 6px; background: rgba(0,0,0,0.06);
+    width: 100%; height: 5px; background: rgba(0,0,0,0.05);
     border-radius: 3px; overflow: hidden;
 }
 .progress-fill {
-    height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2));
+    height: 100%;
+    background: var(--metallic-dark);
     border-radius: 3px; width: 0%;
-    transition: width 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+    transition: width 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
-.visuals { display: none; margin-top: 20px; }
+/* Visuals */
+.visuals { display: none; margin-top: 24px; }
 .visuals.active { display: block; }
-.vis-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.vis-title { font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
 
-#spectrogram { width: 100%; height: 160px; background: #0a0a1a; border-radius: 12px; margin-bottom: 16px; }
-#staff { width: 100%; height: 180px; background: var(--bg); border-radius: 12px; margin-bottom: 16px; border: 1px solid var(--border); }
+#spectrogram {
+    width: 100%; height: 170px; background: #0a0a12;
+    border-radius: 16px; margin-bottom: 20px;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+}
+#staff {
+    width: 100%; height: 180px; background: var(--bg-secondary);
+    border-radius: 16px; margin-bottom: 20px;
+    border: 1px solid var(--border);
+}
 
-.controls { display: flex; gap: 8px; margin-top: 16px; }
+/* Controls */
+.controls { display: flex; gap: 10px; margin-top: 16px; }
 .btn {
-    flex: 1; padding: 14px; border: none; border-radius: 12px;
+    flex: 1; padding: 14px; border: none; border-radius: 14px;
     font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer;
-    transition: all 0.2s ease; text-align: center;
+    transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1); text-align: center;
+    letter-spacing: -0.2px;
 }
 .btn-primary {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: white; box-shadow: 0 4px 12px rgba(0,122,255,0.3);
+    background: var(--metallic-dark);
+    color: white;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
 }
-.btn-primary:hover { transform: translateY(-1px); }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+.btn-primary:active { transform: translateY(0); }
 .btn-secondary {
-    background: var(--bg); color: var(--text); border: 1px solid var(--border);
+    background: var(--bg-secondary); color: var(--text);
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+.btn-secondary:hover { background: #ECECF0; transform: translateY(-1px); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
 
+/* Footer */
 .footer {
     margin-top: auto; padding-top: 32px; text-align: center; width: 100%; max-width: 480px;
 }
-.version-pill {
-    display: inline-flex; align-items: center; gap: 10px;
-    background: var(--card); padding: 6px 14px; border-radius: 100px;
-    box-shadow: var(--shadow); font-size: 11px; color: var(--text2);
-    font-family: "SF Mono", monospace;
+.status-bar {
+    display: inline-flex; align-items: center; gap: 16px;
+    background: var(--card); padding: 8px 18px; border-radius: 100px;
+    box-shadow: var(--shadow); border: 1px solid var(--border);
+    font-size: 12px; color: var(--text2);
+    font-family: "SF Mono", SFMono-Regular, monospace;
+}
+.status-item { display: inline-flex; align-items: center; gap: 6px; }
+.status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #C7C7CC;
+    transition: background 0.4s ease, box-shadow 0.4s ease;
+    position: relative;
+}
+.status-dot.green {
+    background: var(--success);
+    box-shadow: 0 0 6px rgba(52,199,89,0.4);
+}
+.status-dot.red {
+    background: var(--error);
+    box-shadow: 0 0 6px rgba(255,59,48,0.4);
+    animation: pulse-red 2s infinite;
+}
+.status-dot.gray {
+    background: #C7C7CC;
+    box-shadow: none;
+}
+@keyframes pulse-red {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+.status-label { font-weight: 600; color: var(--text); }
+.status-ver { opacity: 0.7; }
+.status-sep { opacity: 0.25; }
+
+/* Subtle loading shimmer for drop zone */
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
 }
 </style>
 </head>
@@ -102,10 +184,16 @@ body {
         <rect x="20" y="18" width="7" height="32" rx="2" fill="white" opacity="0.95"/>
         <rect x="37" y="22" width="7" height="28" rx="2" fill="white" opacity="0.6"/>
         <circle cx="44" cy="16" r="4" fill="white"/>
-        <defs><linearGradient id="lg" x1="0" y1="0" x2="64" y2="64"><stop stop-color="#007AFF"/><stop offset="1" stop-color="#5856D6"/></linearGradient></defs>
+        <defs>
+            <linearGradient id="lg" x1="0" y1="0" x2="64" y2="64">
+                <stop stop-color="#8E8E93"/>
+                <stop offset="0.5" stop-color="#636366"/>
+                <stop offset="1" stop-color="#48484A"/>
+            </linearGradient>
+        </defs>
     </svg>
     <div class="brand">PianoMagic</div>
-    <div class="tagline">FFT → Мелодия → Ноты</div>
+    <div class="tagline">FFT · Мелодия · Ноты</div>
 </div>
 
 <div class="card">
@@ -116,7 +204,6 @@ body {
         <div class="drop-hint">MP3 · WAV · FLAC · M4A</div>
     </div>
 
-    <!-- Прогресс -->
     <div class="progress-area" id="progressArea">
         <div class="progress-header">
             <span class="progress-label" id="progressLabel">Загрузка...</span>
@@ -127,7 +214,6 @@ body {
         </div>
     </div>
 
-    <!-- Визуализация -->
     <div class="visuals" id="visuals">
         <div class="vis-title">Спектрограмма (FFT, 50мс)</div>
         <canvas id="spectrogram"></canvas>
@@ -136,17 +222,25 @@ body {
         <svg id="staff" viewBox="0 0 800 180" preserveAspectRatio="xMidYMid meet"></svg>
 
         <div class="controls">
-            <button class="btn btn-secondary" id="btnPlay">▶️ Прослушать</button>
+            <button class="btn btn-secondary" id="btnPlay">▶ Прослушать</button>
             <button class="btn btn-primary" id="btnRender" disabled>📄 Скачать PDF</button>
         </div>
     </div>
 </div>
 
 <div class="footer">
-    <div class="version-pill">
-        <span>FE <strong>4.1.1</strong></span>
-        <span style="opacity:0.3">|</span>
-        <span>BE <strong id="beVer">—</strong></span>
+    <div class="status-bar">
+        <div class="status-item">
+            <div class="status-dot gray" id="feDot"></div>
+            <span class="status-label">FE</span>
+            <span class="status-ver">4.2.0</span>
+        </div>
+        <span class="status-sep">|</span>
+        <div class="status-item">
+            <div class="status-dot gray" id="beDot"></div>
+            <span class="status-label">BE</span>
+            <span class="status-ver" id="beVer">—</span>
+        </div>
     </div>
 </div>
 
@@ -156,11 +250,57 @@ let currentJobId = null;
 let melodyData = null;
 let fftData = null;
 let audioCtx = null;
+let beCheckInterval = null;
 
-fetch(`${API}/`).then(r => r.ok ? r.json() : null).then(d => {
-    if (d) document.getElementById('beVer').textContent = d.version;
-});
+// ── Status indicators ─────────────────────────────────────────────
+const feDot = document.getElementById('feDot');
+const beDot = document.getElementById('beDot');
+const beVer = document.getElementById('beVer');
 
+function setDot(el, state) {
+    el.classList.remove('green', 'red', 'gray');
+    el.classList.add(state);
+}
+
+// FE status: page loaded + required APIs available
+function checkFE() {
+    try {
+        const ok = !!(window.fetch && window.AudioContext && document.createElement('canvas').getContext('2d'));
+        setDot(feDot, ok ? 'green' : 'red');
+    } catch (e) {
+        setDot(feDot, 'red');
+    }
+}
+
+// BE status: ping health endpoint
+async function checkBE() {
+    try {
+        const ctrl = new AbortController();
+        const to = setTimeout(() => ctrl.abort(), 8000);
+        const r = await fetch(`${API}/`, { signal: ctrl.signal });
+        clearTimeout(to);
+        if (r.ok) {
+            const d = await r.json().catch(() => null);
+            setDot(beDot, 'green');
+            beVer.textContent = (d && d.version) ? d.version : 'ok';
+        } else {
+            setDot(beDot, 'red');
+            beVer.textContent = 'err';
+        }
+    } catch (e) {
+        setDot(beDot, 'red');
+        beVer.textContent = 'off';
+    }
+}
+
+checkFE();
+checkBE();
+beCheckInterval = setInterval(checkBE, 15000);
+
+window.addEventListener('error', () => setDot(feDot, 'red'));
+window.addEventListener('unhandledrejection', () => setDot(feDot, 'red'));
+
+// ── DOM refs ──────────────────────────────────────────────────────
 const dropZone = document.getElementById('dropZone');
 const fileInput = document.getElementById('fileInput');
 const progressArea = document.getElementById('progressArea');
@@ -177,37 +317,45 @@ function setProgress(text, percent) {
     progressFill.style.width = percent + '%';
     progressArea.classList.add('active');
 }
+function hideProgress() { progressArea.classList.remove('active'); }
 
-function hideProgress() {
-    progressArea.classList.remove('active');
-}
-
+// ── Drag & drop ───────────────────────────────────────────────────
 dropZone.addEventListener('click', () => fileInput.click());
-['dragover','dragenter'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.style.borderColor = 'var(--accent)'; }));
+['dragover','dragenter'].forEach(e => dropZone.addEventListener(e, ev => {
+    ev.preventDefault();
+    dropZone.classList.add('drag-active');
+}));
 ['dragleave','drop'].forEach(e => dropZone.addEventListener(e, ev => {
-    ev.preventDefault(); dropZone.style.borderColor = '';
+    ev.preventDefault();
+    dropZone.classList.remove('drag-active');
     if (e === 'drop' && ev.dataTransfer.files.length) handleFile(ev.dataTransfer.files[0]);
 }));
 fileInput.addEventListener('change', e => { if (e.target.files.length) handleFile(e.target.files[0]); });
 
+// ── File handling ─────────────────────────────────────────────────
 function handleFile(file) {
     const valid = /\.(mp3|wav|flac|m4a|ogg)$/i.test(file.name);
     if (!valid) { alert('Выберите аудиофайл'); return; }
 
     visuals.classList.remove('active');
     btnRender.disabled = true;
-    btnPlay.textContent = '▶️ Прослушать';
+    btnPlay.textContent = '▶ Прослушать';
     setProgress('Загрузка файла...', 5);
 
     const formData = new FormData();
     formData.append('file', file);
 
     fetch(`${API}/analyze`, { method: 'POST', body: formData })
-        .then(r => r.json())
+        .then(r => {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+        })
         .then(data => {
             if (data.job_id) {
                 currentJobId = data.job_id;
                 pollStatus(data.job_id);
+            } else {
+                throw new Error('No job_id');
             }
         })
         .catch(err => {
@@ -216,11 +364,13 @@ function handleFile(file) {
         });
 }
 
+// ── Polling ────────────────────────────────────────────────────────
 function pollStatus(jobId) {
     const iv = setInterval(() => {
         fetch(`${API}/status/${jobId}`)
-            .then(r => r.json())
+            .then(r => r.ok ? r.json() : null)
             .then(data => {
+                if (!data) return;
                 setProgress(data.stage_text || 'Обработка...', data.progress || 0);
 
                 if (data.status === 'analyzed') {
@@ -231,7 +381,8 @@ function pollStatus(jobId) {
                     clearInterval(iv);
                     setProgress('Ошибка: ' + (data.error || 'unknown'), 0);
                 }
-            });
+            })
+            .catch(() => {});
     }, 1500);
 }
 
@@ -245,9 +396,13 @@ function loadMelody(jobId) {
             drawSpectrogram(fftData);
             drawStaff(melodyData);
             btnRender.disabled = false;
+        })
+        .catch(err => {
+            alert('Ошибка загрузки мелодии: ' + err.message);
         });
 }
 
+// ── Spectrogram ───────────────────────────────────────────────────
 function drawSpectrogram(frames) {
     const canvas = document.getElementById('spectrogram');
     const ctx = canvas.getContext('2d');
@@ -257,7 +412,7 @@ function drawSpectrogram(frames) {
     canvas.width = w * dpr; canvas.height = h * dpr;
     ctx.scale(dpr, dpr);
 
-    ctx.fillStyle = '#0a0a1a';
+    ctx.fillStyle = '#0a0a12';
     ctx.fillRect(0, 0, w, h);
 
     if (!frames || frames.length === 0) return;
@@ -265,14 +420,15 @@ function drawSpectrogram(frames) {
     const barW = w / frames.length;
     frames.forEach((f, i) => {
         const amp = Math.max(0, Math.min(1, f.amp || 0));
-        const bright = Math.pow(amp, 0.5) * 100;
-        const hue = 200 + amp * 60;
-        ctx.fillStyle = `hsl(${hue}, 90%, ${bright}%)`;
-        const bh = Math.max(2, amp * h * 0.9);
+        const bright = Math.pow(amp, 0.5) * 90;
+        const hue = 210 + amp * 40; // steel-blue to warm silver
+        ctx.fillStyle = `hsl(${hue}, 20%, ${bright}%)`;
+        const bh = Math.max(2, amp * h * 0.92);
         ctx.fillRect(i * barW, h - bh, Math.max(1, barW - 0.5), bh);
     });
 }
 
+// ── Staff ─────────────────────────────────────────────────────────
 function drawStaff(notes) {
     const svg = document.getElementById('staff');
     svg.innerHTML = '';
@@ -301,7 +457,7 @@ function drawStaff(notes) {
 
     const midiToY = (midi) => 110 - (midi - 60) * 3.5;
 
-    notes.forEach((n, i) => {
+    notes.forEach((n) => {
         const y = midiToY(n.pitch);
         const noteW = Math.max(20, n.dur * xScale * 0.8);
 
@@ -341,6 +497,7 @@ function drawStaff(notes) {
     });
 }
 
+// ── Playback ──────────────────────────────────────────────────────
 function playMelody() {
     if (!melodyData || melodyData.length === 0) return;
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -366,14 +523,14 @@ function playMelody() {
         t += n.dur;
     });
 
-    btnPlay.textContent = '⏸️ Остановить';
-    setTimeout(() => { btnPlay.textContent = '▶️ Прослушать'; }, (t - now) * 1000);
+    btnPlay.textContent = '⏸ Остановить';
+    setTimeout(() => { btnPlay.textContent = '▶ Прослушать'; }, (t - now) * 1000);
 }
 
 btnPlay.addEventListener('click', () => {
     if (audioCtx && audioCtx.state === 'running') {
         audioCtx.suspend();
-        btnPlay.textContent = '▶️ Прослушать';
+        btnPlay.textContent = '▶ Прослушать';
     } else {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         audioCtx.resume();
@@ -381,13 +538,17 @@ btnPlay.addEventListener('click', () => {
     }
 });
 
+// ── Render PDF ──────────────────────────────────────────────────
 btnRender.addEventListener('click', () => {
     if (!currentJobId) return;
     btnRender.disabled = true;
     btnRender.textContent = '⏳ Рендер...';
 
     fetch(`${API}/render/${currentJobId}`, { method: 'POST' })
-        .then(r => r.json())
+        .then(r => {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+        })
         .then(data => {
             if (data.status === 'completed') {
                 window.location.href = `${API}/download/${currentJobId}.pdf`;
