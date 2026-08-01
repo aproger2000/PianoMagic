@@ -6,7 +6,7 @@
     <title>PianoMagic 5.0 — Аудио в ноты</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         :root {
             --bg: #0f0f1a;
             --surface: #1a1a2e;
@@ -21,7 +21,7 @@
             --text-muted: #94a3b8;
             --border: #334155;
         }
-        
+
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: var(--bg);
@@ -29,18 +29,18 @@
             min-height: 100vh;
             line-height: 1.6;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
-        
+
         header {
             text-align: center;
             padding: 40px 20px 30px;
         }
-        
+
         header h1 {
             font-size: 2.8rem;
             font-weight: 800;
@@ -49,22 +49,22 @@
             -webkit-text-fill-color: transparent;
             margin-bottom: 8px;
         }
-        
+
         header .version {
             color: var(--text-muted);
             font-size: 0.9rem;
             letter-spacing: 2px;
             text-transform: uppercase;
         }
-        
+
         header p {
             color: var(--text-muted);
             margin-top: 12px;
             font-size: 1.1rem;
         }
-        
+
         .upload-section { margin: 30px 0; }
-        
+
         .drop-zone {
             border: 2px dashed var(--border);
             border-radius: 20px;
@@ -76,19 +76,18 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .drop-zone:hover, .drop-zone.dragover {
             border-color: var(--primary);
             background: var(--surface-light);
             transform: translateY(-2px);
             box-shadow: 0 10px 40px rgba(99, 102, 241, 0.15);
         }
-        
+
         .drop-zone .icon { font-size: 4rem; margin-bottom: 20px; opacity: 0.7; }
         .drop-zone h3 { font-size: 1.4rem; margin-bottom: 10px; color: var(--text); }
         .drop-zone p { color: var(--text-muted); font-size: 0.95rem; }
-        .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-        
+
         .file-info {
             display: none;
             align-items: center;
@@ -103,7 +102,7 @@
         .file-info .file-details { flex: 1; text-align: left; }
         .file-info .file-name { font-weight: 600; color: var(--text); }
         .file-info .file-size { color: var(--text-muted); font-size: 0.85rem; }
-        
+
         .btn {
             padding: 12px 28px;
             border: none;
@@ -126,7 +125,7 @@
             box-shadow: 0 5px 20px rgba(99, 102, 241, 0.4);
         }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
-        
+
         .progress-section {
             display: none;
             margin: 30px 0;
@@ -135,7 +134,7 @@
             border-radius: 20px;
         }
         .progress-section.visible { display: block; }
-        
+
         .progress-header {
             display: flex;
             justify-content: space-between;
@@ -144,7 +143,7 @@
         }
         .progress-header h3 { font-size: 1.2rem; }
         .progress-percent { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
-        
+
         .progress-bar-container {
             height: 10px;
             background: var(--surface-light);
@@ -159,7 +158,7 @@
             transition: width 0.5s ease;
             width: 0%;
         }
-        
+
         .stages { display: flex; justify-content: space-between; gap: 10px; }
         .stage {
             flex: 1;
@@ -186,10 +185,10 @@
         }
         .stage.active::after { background: var(--primary); box-shadow: 0 0 10px var(--primary); }
         .stage.completed::after { background: var(--success); }
-        
+
         .results-section { display: none; margin: 30px 0; }
         .results-section.visible { display: block; }
-        
+
         .similarity-card {
             background: var(--surface);
             border-radius: 20px;
@@ -202,13 +201,13 @@
         .similarity-card.good { border-color: var(--success); }
         .similarity-card.warning { border-color: var(--warning); }
         .similarity-card.bad { border-color: var(--danger); }
-        
+
         .similarity-value { font-size: 4rem; font-weight: 800; line-height: 1; margin: 15px 0; }
         .similarity-value.good { color: var(--success); }
         .similarity-value.warning { color: var(--warning); }
         .similarity-value.bad { color: var(--danger); }
         .similarity-label { color: var(--text-muted); font-size: 1rem; }
-        
+
         .similarity-message {
             margin-top: 15px;
             padding: 12px 20px;
@@ -218,7 +217,7 @@
         .similarity-message.good { background: rgba(34, 197, 94, 0.15); color: var(--success); }
         .similarity-message.warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
         .similarity-message.bad { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
-        
+
         .spec-section, .piano-section, .audio-section {
             background: var(--surface);
             border-radius: 20px;
@@ -229,7 +228,7 @@
             margin-bottom: 15px;
             font-size: 1.1rem;
         }
-        
+
         .spec-canvas {
             width: 100%;
             height: 200px;
@@ -237,7 +236,7 @@
             border-radius: 12px;
             image-rendering: pixelated;
         }
-        
+
         .piano-roll {
             width: 100%;
             height: 280px;
@@ -247,7 +246,7 @@
             position: relative;
         }
         .piano-roll canvas { display: block; }
-        
+
         .piano-legend {
             display: flex;
             gap: 20px;
@@ -257,9 +256,9 @@
         }
         .legend-item { display: flex; align-items: center; gap: 6px; }
         .legend-color { width: 16px; height: 16px; border-radius: 4px; }
-        
+
         audio { width: 100%; border-radius: 10px; }
-        
+
         .actions {
             display: flex;
             gap: 15px;
@@ -276,7 +275,7 @@
             color: white;
             border-color: var(--primary);
         }
-        
+
         .error-section {
             display: none;
             background: rgba(239, 68, 68, 0.1);
@@ -288,14 +287,27 @@
         }
         .error-section.visible { display: block; }
         .error-section h3 { color: var(--danger); margin-bottom: 10px; }
-        
+
+        .debug-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: var(--bg);
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: left;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
         @media (max-width: 768px) {
             header h1 { font-size: 2rem; }
             .stages { flex-wrap: wrap; }
             .stage { font-size: 0.7rem; padding: 8px 4px; }
             .similarity-value { font-size: 3rem; }
         }
-        
+
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -310,15 +322,15 @@
             <div class="version">Версия 5.0 — Universal Melody Fitter</div>
             <p>Загрузите любую мелодию — получите фортепианную партию для двух рук</p>
         </header>
-        
+
         <section class="upload-section">
             <div class="drop-zone" id="dropZone">
-                <input type="file" id="fileInput" accept="audio/*">
                 <div class="icon">🎵</div>
                 <h3>Перетащите аудиофайл сюда</h3>
                 <p>MP3, WAV, FLAC, M4A до 50 МБ</p>
             </div>
-            
+            <input type="file" id="fileInput" accept="audio/*" style="display:none">
+
             <div class="file-info" id="fileInfo">
                 <div class="file-icon">🎵</div>
                 <div class="file-details">
@@ -330,7 +342,7 @@
                 </button>
             </div>
         </section>
-        
+
         <section class="progress-section" id="progressSection">
             <div class="progress-header">
                 <h3 id="stageText">Анализ аудио...</h3>
@@ -349,12 +361,13 @@
                 <div class="stage" data-stage="done">Готово</div>
             </div>
         </section>
-        
+
         <section class="error-section" id="errorSection">
             <h3>❌ Ошибка обработки</h3>
             <p id="errorText">Что-то пошло не так</p>
+            <div class="debug-info" id="debugInfo"></div>
         </section>
-        
+
         <section class="results-section" id="resultsSection">
             <div class="similarity-card" id="similarityCard">
                 <div class="similarity-label">Сходство с оригиналом</div>
@@ -362,12 +375,12 @@
                 <div class="similarity-label">Fingerprint Match</div>
                 <div class="similarity-message" id="similarityMessage"></div>
             </div>
-            
+
             <div class="spec-section">
                 <h3>📊 Спектрограмма</h3>
                 <canvas class="spec-canvas" id="specCanvas"></canvas>
             </div>
-            
+
             <div class="piano-section">
                 <h3>🎹 Партитура (предпросмотр)</h3>
                 <div class="piano-roll">
@@ -384,12 +397,12 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="audio-section">
                 <h3>🔊 Прослушать результат</h3>
                 <audio id="audioPlayer" controls></audio>
             </div>
-            
+
             <div class="actions">
                 <a class="btn btn-download" id="downloadPdf" target="_blank">
                     📄 Скачать PDF (ноты)
@@ -403,17 +416,28 @@
             </div>
         </section>
     </div>
-    
+
     <script>
+        // ==========================================
+        // CONFIG
+        // ==========================================
         const API_BASE = 'https://pianomagic-api.onrender.com';
+        // const API_BASE = 'http://localhost:8000';
+
         const STAGES_ORDER = ['upload','analyze','melody','fit','compare','render','done'];
-        
+
+        // ==========================================
+        // STATE
+        // ==========================================
         let currentJobId = null;
         let pollInterval = null;
         let selectedFile = null;
-        
+
+        // ==========================================
+        // DOM ELEMENTS
+        // ==========================================
         const dropZone = document.getElementById('dropZone');
-n        const fileInput = document.getElementById('fileInput');
+        const fileInput = document.getElementById('fileInput');
         const fileInfo = document.getElementById('fileInfo');
         const fileName = document.getElementById('fileName');
         const fileSize = document.getElementById('fileSize');
@@ -426,67 +450,137 @@ n        const fileInput = document.getElementById('fileInput');
         const resultsSection = document.getElementById('resultsSection');
         const errorSection = document.getElementById('errorSection');
         const errorText = document.getElementById('errorText');
-        
+        const debugInfo = document.getElementById('debugInfo');
+
+        // ==========================================
+        // FILE UPLOAD
+        // ==========================================
+
+        // Click on drop zone opens file picker
+        dropZone.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            fileInput.click();
+        });
+
         dropZone.addEventListener('dragover', (e) => {
             e.preventDefault();
+            e.stopPropagation();
             dropZone.classList.add('dragover');
         });
-        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('dragover');
+        });
+
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
+            e.stopPropagation();
             dropZone.classList.remove('dragover');
-            if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
+            const files = e.dataTransfer.files;
+            if (files.length > 0) handleFile(files[0]);
         });
+
         fileInput.addEventListener('change', (e) => {
             if (e.target.files.length > 0) handleFile(e.target.files[0]);
         });
-        
+
         function handleFile(file) {
-            if (!file.type.startsWith('audio/')) { alert('Пожалуйста, выберите аудиофайл'); return; }
-            if (file.size > 50 * 1024 * 1024) { alert('Файл слишком большой. Максимум 50 МБ'); return; }
+            console.log('File selected:', file.name, file.type, file.size);
+            if (!file.type.startsWith('audio/')) {
+                alert('Пожалуйста, выберите аудиофайл (MP3, WAV, FLAC, M4A)');
+                return;
+            }
+            if (file.size > 50 * 1024 * 1024) {
+                alert('Файл слишком большой. Максимум 50 МБ');
+                return;
+            }
             selectedFile = file;
             fileName.textContent = file.name;
             fileSize.textContent = formatBytes(file.size);
             fileInfo.classList.add('visible');
             dropZone.style.display = 'none';
         }
-        
+
         function formatBytes(bytes) {
             if (bytes === 0) return '0 Bytes';
             const k = 1024;
-            const sizes = ['Bytes','KB','MB','GB'];
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
         }
-        
+
+        // ==========================================
+        // PROCESSING
+        // ==========================================
         async function startProcessing() {
-            if (!selectedFile) return;
+            if (!selectedFile) {
+                alert('Сначала выберите файл');
+                return;
+            }
+
             processBtn.disabled = true;
             processBtn.textContent = '⏳ Отправка...';
-            
+
             try {
                 const formData = new FormData();
-                formData.append('file', selectedFile);
-                const response = await fetch(`${API_BASE}/analyze`, { method: 'POST', body: formData });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                formData.append('file', selectedFile, selectedFile.name);
+
+                console.log('Sending to:', API_BASE + '/analyze');
+                console.log('File:', selectedFile.name, selectedFile.type, selectedFile.size);
+
+                const response = await fetch(API_BASE + '/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                console.log('Response status:', response.status);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error('HTTP ' + response.status + ': ' + errorText);
+                }
+
                 const data = await response.json();
+                console.log('Response:', data);
+
+                if (!data.job_id) {
+                    throw new Error('Сервер не вернул job_id');
+                }
+
                 currentJobId = data.job_id;
+
                 progressSection.classList.add('visible');
                 fileInfo.style.display = 'none';
+
                 startPolling();
+
             } catch (err) {
+                console.error('Upload error:', err);
                 showError('Не удалось отправить файл: ' + err.message);
                 processBtn.disabled = false;
                 processBtn.textContent = '🚀 Обработать';
             }
         }
-        
+
+        // ==========================================
+        // POLLING
+        // ==========================================
         function startPolling() {
             pollInterval = setInterval(async () => {
                 try {
-                    const res = await fetch(`${API_BASE}/status/${currentJobId}`);
+                    const res = await fetch(API_BASE + '/status/' + currentJobId);
+                    if (!res.ok) {
+                        console.error('Status poll failed:', res.status);
+                        return;
+                    }
                     const data = await res.json();
+                    console.log('Status:', data.stage, data.progress + '%');
+
                     updateProgress(data);
+
                     if (data.status === 'completed') {
                         clearInterval(pollInterval);
                         await loadResults();
@@ -494,37 +588,55 @@ n        const fileInput = document.getElementById('fileInput');
                         clearInterval(pollInterval);
                         showError(data.error || 'Обработка завершилась с ошибкой');
                     }
-                } catch (err) { console.error('Poll error:', err); }
-            }, 1500);
+                } catch (err) {
+                    console.error('Poll error:', err);
+                }
+            }, 2000);
         }
-        
+
         function updateProgress(data) {
             const percent = data.progress || 0;
             progressBar.style.width = percent + '%';
             progressPercent.textContent = percent + '%';
             stageText.textContent = data.stage_text || 'Обработка...';
+
             const currentStageIdx = STAGES_ORDER.indexOf(data.stage);
+
             stages.forEach(stage => {
                 const stageName = stage.dataset.stage;
                 const stageIdx = STAGES_ORDER.indexOf(stageName);
+
                 stage.classList.remove('active', 'completed');
-                if (stageIdx < currentStageIdx) stage.classList.add('completed');
-                else if (stageIdx === currentStageIdx) stage.classList.add('active');
+
+                if (stageIdx < currentStageIdx) {
+                    stage.classList.add('completed');
+                } else if (stageIdx === currentStageIdx) {
+                    stage.classList.add('active');
+                }
             });
         }
-        
+
+        // ==========================================
+        // RESULTS
+        // ==========================================
         async function loadResults() {
             try {
-                const res = await fetch(`${API_BASE}/melody/${currentJobId}`);
+                const res = await fetch(API_BASE + '/melody/' + currentJobId);
+                if (!res.ok) {
+                    throw new Error('HTTP ' + res.status);
+                }
                 const data = await res.json();
-                
+                console.log('Results:', data);
+
+                // Similarity
                 const similarity = data.similarity || 0;
                 const simPercent = Math.round(similarity * 100);
                 const simValue = document.getElementById('similarityValue');
                 const simCard = document.getElementById('similarityCard');
                 const simMessage = document.getElementById('similarityMessage');
-                
+
                 simValue.textContent = simPercent + '%';
+
                 if (similarity >= 0.90) {
                     simValue.className = 'similarity-value good';
                     simCard.className = 'similarity-card good';
@@ -541,109 +653,163 @@ n        const fileInput = document.getElementById('fileInput');
                     simMessage.className = 'similarity-message bad';
                     simMessage.textContent = '❌ Сходство ниже ожидаемого. Мелодия может быть сложной для распознавания.';
                 }
-                
-                if (data.spec) drawSpectrogram(data.spec);
+
+                // Spectrogram
+                if (data.spec) {
+                    drawSpectrogram(data.spec);
+                }
+
+                // Piano Roll
                 if (data.melody_rh || data.melody_lh) {
                     drawPianoRoll(data.melody_rh || [], data.melody_lh || [], data.duration);
                 }
-                
-                document.getElementById('audioPlayer').src = `${API_BASE}/download/${currentJobId}.wav`;
-                document.getElementById('downloadPdf').href = `${API_BASE}/download/${currentJobId}.pdf`;
-                document.getElementById('downloadWav').href = `${API_BASE}/download/${currentJobId}.wav`;
-                
+
+                // Audio
+                const audioPlayer = document.getElementById('audioPlayer');
+                audioPlayer.src = API_BASE + '/download/' + currentJobId + '.wav';
+
+                // Download links
+                document.getElementById('downloadPdf').href = API_BASE + '/download/' + currentJobId + '.pdf';
+                document.getElementById('downloadWav').href = API_BASE + '/download/' + currentJobId + '.wav';
+
                 resultsSection.classList.add('visible', 'slide-up');
                 progressSection.style.display = 'none';
+
             } catch (err) {
+                console.error('Load results error:', err);
                 showError('Не удалось загрузить результаты: ' + err.message);
             }
         }
-        
+
+        // ==========================================
+        // VISUALIZATIONS
+        // ==========================================
         function drawSpectrogram(specData) {
             const canvas = document.getElementById('specCanvas');
             const ctx = canvas.getContext('2d');
-            const w = canvas.clientWidth;
+
+            const w = canvas.clientWidth || 800;
             const h = 200;
-            canvas.width = w; canvas.height = h;
+            canvas.width = w;
+            canvas.height = h;
+
             if (!specData || specData.length === 0) return;
+
             const rows = specData.length;
             const cols = specData[0].length;
+
             const cellW = w / cols;
             const cellH = h / rows;
+
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < cols; c++) {
                     const val = specData[r][c];
                     const intensity = val / 255;
+
                     const r_ = Math.floor(68 + intensity * (253 - 68));
                     const g_ = Math.floor(1 + intensity * (231 - 1));
                     const b_ = Math.floor(84 + intensity * (37 - 84));
-                    ctx.fillStyle = `rgb(${r_},${g_},${b_})`;
+
+                    ctx.fillStyle = 'rgb(' + r_ + ',' + g_ + ',' + b_ + ')';
                     ctx.fillRect(c * cellW, (rows - 1 - r) * cellH, cellW + 1, cellH + 1);
                 }
             }
         }
-        
+
         function drawPianoRoll(rhNotes, lhNotes, duration) {
             const canvas = document.getElementById('pianoCanvas');
             const ctx = canvas.getContext('2d');
+
             const NOTE_HEIGHT = 12;
             const PADDING = 40;
             const WIDTH = Math.max(800, duration * 100);
             const HEIGHT = 280;
-            canvas.width = WIDTH; canvas.height = HEIGHT;
+
+            canvas.width = WIDTH;
+            canvas.height = HEIGHT;
+
             ctx.fillStyle = '#0f0f1a';
             ctx.fillRect(0, 0, WIDTH, HEIGHT);
-            
-            ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1;
+
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+
             for (let t = 0; t <= duration; t++) {
                 const x = PADDING + (t / duration) * (WIDTH - PADDING * 2);
-                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, HEIGHT); ctx.stroke();
-                ctx.fillStyle = '#64748b'; ctx.font = '10px sans-serif';
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, HEIGHT);
+                ctx.stroke();
+
+                ctx.fillStyle = '#64748b';
+                ctx.font = '10px sans-serif';
                 ctx.fillText(t + 's', x + 2, HEIGHT - 5);
             }
+
             for (let midi = 36; midi <= 96; midi += 12) {
                 const y = HEIGHT - ((midi - 36) / 60) * (HEIGHT - 20) - 10;
-                ctx.strokeStyle = '#334155'; ctx.beginPath(); ctx.moveTo(PADDING, y); ctx.lineTo(WIDTH - PADDING, y); ctx.stroke();
-                ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif';
+                ctx.strokeStyle = '#334155';
+                ctx.beginPath();
+                ctx.moveTo(PADDING, y);
+                ctx.lineTo(WIDTH - PADDING, y);
+                ctx.stroke();
+
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '10px sans-serif';
                 ctx.fillText(midiToName(midi), 5, y + 3);
             }
-            
-            const allNotes = [
-                ...rhNotes.map(n => ({...n, hand: 'RH'})),
-                ...lhNotes.map(n => ({...n, hand: 'LH'}))
-            ];
-            allNotes.forEach(note => {
+
+            const allNotes = rhNotes.map(function(n) { return Object.assign({}, n, {hand: 'RH'}); })
+                .concat(lhNotes.map(function(n) { return Object.assign({}, n, {hand: 'LH'}); }));
+
+            allNotes.forEach(function(note) {
                 const x = PADDING + (note.start / duration) * (WIDTH - PADDING * 2);
                 const w = Math.max(2, (note.dur / duration) * (WIDTH - PADDING * 2));
                 const y = HEIGHT - ((note.pitch - 36) / 60) * (HEIGHT - 20) - 10 - NOTE_HEIGHT / 2;
+
                 const color = note.hand === 'RH' ? '#6366f1' : '#f59e0b';
+
                 ctx.fillStyle = color;
                 ctx.globalAlpha = 0.7 + (note.velocity / 127) * 0.3;
                 ctx.fillRect(x, y, w, NOTE_HEIGHT);
-                ctx.strokeStyle = color; ctx.globalAlpha = 1; ctx.lineWidth = 1;
+
+                ctx.strokeStyle = color;
+                ctx.globalAlpha = 1;
+                ctx.lineWidth = 1;
                 ctx.strokeRect(x, y, w, NOTE_HEIGHT);
             });
         }
-        
+
         function midiToName(midi) {
-            const names = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+            var names = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
             return names[midi % 12] + (Math.floor(midi / 12) - 1);
         }
-        
+
+        // ==========================================
+        // ERROR
+        // ==========================================
         function showError(message) {
             errorText.textContent = message;
+            debugInfo.textContent = 'Debug: API_BASE=' + API_BASE + '\njob_id=' + (currentJobId || 'null');
             errorSection.classList.add('visible');
             progressSection.style.display = 'none';
             processBtn.disabled = false;
             processBtn.textContent = '🚀 Обработать';
         }
-        
+
+        // ==========================================
+        // HEALTH CHECK
+        // ==========================================
         async function checkHealth() {
             try {
-                const res = await fetch(`${API_BASE}/`, { method: 'GET' });
+                const res = await fetch(API_BASE + '/', { method: 'GET' });
                 const data = await res.json();
                 console.log('API Health:', data);
-            } catch (err) { console.warn('API недоступен:', err.message); }
+            } catch (err) {
+                console.warn('API недоступен:', err.message);
+            }
         }
+
         checkHealth();
     </script>
 </body>
