@@ -137,7 +137,7 @@ body {
 
 <div class="footer">
     <div class="status-bar">
-        <div class="status-item"><div class="status-dot gray" id="feDot"></div><span class="status-label">FE</span><span class="status-ver">4.2.1</span></div>
+        <div class="status-item"><div class="status-dot gray" id="feDot"></div><span class="status-label">FE</span><span class="status-ver">4.2.2</span></div>
         <span class="status-sep">|</span>
         <div class="status-item"><div class="status-dot gray" id="beDot"></div><span class="status-label">BE</span><span class="status-ver" id="beVer">—</span></div>
     </div>
@@ -256,40 +256,45 @@ function drawSpectrogram(specMatrix) {
     const dpr = window.devicePixelRatio || 1;
     const w = canvas.clientWidth;
     const h = canvas.clientHeight;
-    canvas.width = w * dpr; canvas.height = h * dpr;
-    ctx.scale(dpr, dpr);
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
 
     if (!specMatrix || specMatrix.length === 0 || specMatrix[0].length === 0) {
-        ctx.fillStyle = '#0a0a12'; ctx.fillRect(0,0,w,h); return;
+        ctx.fillStyle = '#0a0a12';
+        ctx.fillRect(0, 0, w, h);
+        return;
     }
 
     const freqs = specMatrix.length;
     const times = specMatrix[0].length;
-    const cellW = w / times;
-    const cellH = h / freqs;
 
-    // Find min/max for normalization
-    let minVal = Infinity, maxVal = -Infinity;
+    // Build ImageData
+    const imgData = ctx.createImageData(times, freqs);
     for (let i = 0; i < freqs; i++) {
         for (let j = 0; j < times; j++) {
-            const v = specMatrix[i][j];
-            if (v < minVal) minVal = v;
-            if (v > maxVal) maxVal = v;
+            const v = specMatrix[i][j] / 255; // uint8 -> 0..1
+            const idx = ((freqs - 1 - i) * times + j) * 4;
+            // Magma-like: dark purple -> orange -> white
+            const r = Math.min(255, Math.floor(v * 280));
+            const g = Math.min(255, Math.floor(v * v * 200));
+            const b = Math.min(255, Math.floor(30 + v * 120));
+            imgData.data[idx] = r;
+            imgData.data[idx + 1] = g;
+            imgData.data[idx + 2] = b;
+            imgData.data[idx + 3] = 255;
         }
     }
-    const range = maxVal - minVal || 1;
 
-    for (let i = 0; i < freqs; i++) {
-        for (let j = 0; j < times; j++) {
-            const norm = (specMatrix[i][j] - minVal) / range;
-            // Steel/fire colormap: dark -> purple -> orange -> white
-            const r = Math.min(255, norm * 400);
-            const g = Math.min(255, norm * norm * 300);
-            const b = Math.min(255, 50 + norm * 150);
-            ctx.fillStyle = `rgb(${Math.floor(r)},${Math.floor(g)},${Math.floor(b)})`;
-            ctx.fillRect(j * cellW, h - (i+1) * cellH, cellW + 0.5, cellH + 0.5);
-        }
-    }
+    // Draw to temp canvas and scale to display
+    const temp = document.createElement('canvas');
+    temp.width = times;
+    temp.height = freqs;
+    temp.getContext('2d').putImageData(imgData, 0, 0);
+
+    ctx.save();
+    ctx.scale(dpr, dpr);
+    ctx.drawImage(temp, 0, 0, w, h);
+    ctx.restore();
 }
 
 // ── Staff ──────────────────────────────────────────────────────────
