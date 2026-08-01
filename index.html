@@ -233,16 +233,17 @@ function pollStatus(jobId) {
     }, 1500);
 }
 
+// В loadMelody:
 function loadMelody(jobId) {
     fetch(`${API}/melody/${jobId}`)
         .then(r => r.json())
         .then(data => {
-            melodyData = data.melody;
-            fftData = data.fft;
+            melodyDataRH = data.melody_rh;
+            melodyDataLH = data.melody_lh;
             specData = data.spec;
             visuals.classList.add('active');
             drawSpectrogram(specData);
-            drawStaff(melodyData);
+            drawGrandStaff(melodyDataRH, melodyDataLH);
             btnRender.disabled = false;
             btnWav.disabled = false;
         })
@@ -298,70 +299,85 @@ function drawSpectrogram(specMatrix) {
 }
 
 // ── Staff ──────────────────────────────────────────────────────────
-function drawStaff(notes) {
+// Новая функция отрисовки двух станов
+function drawGrandStaff(rhNotes, lhNotes) {
     const svg = document.getElementById('staff');
     svg.innerHTML = '';
-    const w = 800, h = 180;
-    const lineY = [50, 65, 80, 95, 110];
-
-    lineY.forEach(y => {
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    const w = 800, h = 320;  // taller for two staves
+    
+    // Treble staff (RH) — top
+    const trebleY = [40, 55, 70, 85, 100];
+    trebleY.forEach(y => {
+        const line = document.createElementNS('http://www.w3.org/2000/svg','line');
         line.setAttribute('x1','60'); line.setAttribute('y1',y);
         line.setAttribute('x2',w-10); line.setAttribute('y2',y);
         line.setAttribute('stroke','#1D1D1F'); line.setAttribute('stroke-width','1.2');
         svg.appendChild(line);
     });
+    const trebleClef = document.createElementNS('http://www.w3.org/2000/svg','text');
+    trebleClef.setAttribute('x','15'); trebleClef.setAttribute('y','95');
+    trebleClef.setAttribute('font-size','38'); trebleClef.setAttribute('font-family','serif');
+    trebleClef.textContent = '𝄞';
+    svg.appendChild(trebleClef);
 
-    const clef = document.createElementNS('http://www.w3.org/2000/svg','text');
-    clef.setAttribute('x','15'); clef.setAttribute('y','95');
-    clef.setAttribute('font-size','42'); clef.setAttribute('font-family','serif');
-    clef.textContent = '𝄞';
-    svg.appendChild(clef);
-
-    if (!notes || notes.length === 0) return;
-
-    const totalTime = notes.reduce((s,n)=>s+n.dur,0) * 1.2;
-    const xScale = (w - 80) / Math.max(totalTime, 4);
-    let x = 70;
-    const midiToY = (midi) => 110 - (midi - 60) * 3.5;
-
-    notes.forEach(n => {
-        const y = midiToY(n.pitch);
-        const noteW = Math.max(20, n.dur * xScale * 0.8);
-
-        const note = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
-        note.setAttribute('cx', x + noteW/2); note.setAttribute('cy', y);
-        note.setAttribute('rx', noteW/2); note.setAttribute('ry','5');
-        note.setAttribute('fill','#1D1D1F');
-        svg.appendChild(note);
-
-        const stemDir = y > 80 ? -1 : 1;
-        const stem = document.createElementNS('http://www.w3.org/2000/svg','line');
-        stem.setAttribute('x1', x + noteW - 2); stem.setAttribute('y1', y);
-        stem.setAttribute('x2', x + noteW - 2); stem.setAttribute('y2', y + stemDir * 30);
-        stem.setAttribute('stroke','#1D1D1F'); stem.setAttribute('stroke-width','1.5');
-        svg.appendChild(stem);
-
-        if (n.pitch >= 77) {
-            for (let ly = 50; ly > y; ly -= 15) {
-                const ll = document.createElementNS('http://www.w3.org/2000/svg','line');
-                ll.setAttribute('x1',x); ll.setAttribute('y1',ly);
-                ll.setAttribute('x2',x+noteW); ll.setAttribute('y2',ly);
-                ll.setAttribute('stroke','#1D1D1F'); ll.setAttribute('stroke-width','0.8');
-                svg.appendChild(ll);
-            }
-        }
-        if (n.pitch <= 56) {
-            for (let ly = 110; ly < y; ly += 15) {
-                const ll = document.createElementNS('http://www.w3.org/2000/svg','line');
-                ll.setAttribute('x1',x); ll.setAttribute('y1',ly);
-                ll.setAttribute('x2',x+noteW); ll.setAttribute('y2',ly);
-                ll.setAttribute('stroke','#1D1D1F'); ll.setAttribute('stroke-width','0.8');
-                svg.appendChild(ll);
-            }
-        }
-        x += noteW + 8;
+    // Bass staff (LH) — bottom
+    const bassY = [180, 195, 210, 225, 240];
+    bassY.forEach(y => {
+        const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+        line.setAttribute('x1','60'); line.setAttribute('y1',y);
+        line.setAttribute('x2',w-10); line.setAttribute('y2',y);
+        line.setAttribute('stroke','#1D1D1F'); line.setAttribute('stroke-width','1.2');
+        svg.appendChild(line);
     });
+    const bassClef = document.createElementNS('http://www.w3.org/2000/svg','text');
+    bassClef.setAttribute('x','15'); bassClef.setAttribute('y','235');
+    bassClef.setAttribute('font-size','32'); bassClef.setAttribute('font-family','serif');
+    bassClef.textContent = '𝄢';
+    svg.appendChild(bassClef);
+
+    // Brace connecting staves
+    const brace = document.createElementNS('http://www.w3.org/2000/svg','path');
+    brace.setAttribute('d','M 50 40 Q 45 100 50 140 Q 55 100 50 40 M 50 180 Q 45 240 50 280');
+    brace.setAttribute('stroke','#1D1D1F'); brace.setAttribute('stroke-width','2'); brace.setAttribute('fill','none');
+    svg.appendChild(brace);
+
+    // Draw RH notes
+    if (rhNotes && rhNotes.length > 0) {
+        const totalTime = rhNotes.reduce((s,n)=>s+n.dur,0) * 1.2;
+        const xScale = (w - 80) / Math.max(totalTime, 4);
+        let x = 70;
+        const midiToY = (midi) => 100 - (midi - 64) * 3.5;  // centered around middle C (64)
+        
+        rhNotes.forEach(n => {
+            const y = midiToY(n.pitch);
+            const noteW = Math.max(16, n.dur * xScale * 0.8);
+            const note = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+            note.setAttribute('cx', x + noteW/2); note.setAttribute('cy', y);
+            note.setAttribute('rx', noteW/2); note.setAttribute('ry','4.5');
+            note.setAttribute('fill','#1D1D1F');
+            svg.appendChild(note);
+            x += noteW + 6;
+        });
+    }
+
+    // Draw LH notes
+    if (lhNotes && lhNotes.length > 0) {
+        const totalTime = lhNotes.reduce((s,n)=>s+n.dur,0) * 1.2;
+        const xScale = (w - 80) / Math.max(totalTime, 4);
+        let x = 70;
+        const midiToY = (midi) => 240 - (midi - 40) * 3.5;  // bass range
+        
+        lhNotes.forEach(n => {
+            const y = midiToY(n.pitch);
+            const noteW = Math.max(16, n.dur * xScale * 0.8);
+            const note = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+            note.setAttribute('cx', x + noteW/2); note.setAttribute('cy', y);
+            note.setAttribute('rx', noteW/2); note.setAttribute('ry','4.5');
+            note.setAttribute('fill','#1D1D1F');
+            svg.appendChild(note);
+            x += noteW + 6;
+        });
+    }
 }
 
 // ── Playback ──────────────────────────────────────────────────────
