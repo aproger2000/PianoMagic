@@ -313,29 +313,131 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .slide-up { animation: slideUp 0.5s ease forwards; }
-        .app-footer {
-    margin-top: 40px;
-    padding: 20px;
-    background: var(--surface);
-    border-radius: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    border: 1px solid var(--border);
-    flex-wrap: wrap;
-    gap: 10px;
-}
-.footer-block { display: flex; align-items: center; gap: 8px; }
-.footer-label { text-transform: uppercase; letter-spacing: 1px; font-size: 0.7rem; }
-.footer-version { font-weight: 700; color: var(--text); font-family: monospace; }
-.footer-status { font-size: 0.7rem; }
-.footer-status.online { color: var(--success); }
-.footer-status.offline { color: var(--danger); }
-.footer-api { font-family: monospace; font-size: 0.8rem; }
-        
-    </style>
+    
+        /* ===== ORIGINAL AUDIO & STAFF ===== */
+        .original-audio-section {
+            display: none;
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+        }
+        .original-audio-section.visible { display: block; }
+        .original-audio-section h3 {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .original-audio-section audio {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .staff-section {
+            display: none;
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+        }
+        .staff-section.visible { display: block; }
+        .staff-section h3 {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .staff-container {
+            width: 100%;
+            overflow-x: auto;
+            background: var(--bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+        .staff-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        .staff-container::-webkit-scrollbar-track {
+            background: var(--surface);
+            border-radius: 4px;
+        }
+        .staff-container::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+        .staff-svg {
+            display: block;
+            min-width: 100%;
+        }
+        .staff-line {
+            stroke: #64748b;
+            stroke-width: 1.2;
+        }
+        .staff-note {
+            fill: var(--primary);
+            stroke: var(--primary);
+            stroke-width: 1;
+            transition: all 0.15s ease;
+            cursor: pointer;
+        }
+        .staff-note:hover {
+            fill: var(--accent);
+            stroke: var(--accent);
+            filter: drop-shadow(0 0 6px var(--accent));
+        }
+        .staff-note.active {
+            fill: var(--accent);
+            stroke: var(--accent);
+            filter: drop-shadow(0 0 10px var(--accent));
+            transform-origin: center;
+        }
+        .playhead {
+            stroke: #ef4444;
+            stroke-width: 2;
+            filter: drop-shadow(0 0 4px #ef4444);
+        }
+        .ledger-line {
+            stroke: #64748b;
+            stroke-width: 1;
+        }
+        .staff-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .staff-controls button {
+            padding: 8px 16px;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .staff-controls button:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        .staff-time {
+            font-family: monospace;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .note-sharp {
+            fill: var(--text);
+            font-size: 14px;
+            font-family: serif;
+        }
+</style>
 </head>
 <body>
     <div class="container">
@@ -364,6 +466,11 @@
                 </button>
             </div>
         </section>
+        <section class="original-audio-section" id="originalAudioSection">
+            <h3>🎵 Оригинальная мелодия</h3>
+            <audio id="originalPlayer" controls></audio>
+        </section>
+
 
         <section class="progress-section" id="progressSection">
             <div class="progress-header">
@@ -425,7 +532,19 @@
                 <audio id="audioPlayer" controls></audio>
             </div>
 
-            <div class="actions">
+     
+            <div class="staff-section" id="staffSection">
+                <h3>🎼 Нотный стан — мелодия в реальном времени</h3>
+                <div class="staff-container" id="staffContainer">
+                    <svg id="staffSvg" class="staff-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+                </div>
+                <div class="staff-controls">
+                    <button onclick="syncStaffToStart()">⏮ Начало</button>
+                    <button onclick="toggleStaffPlay()" id="staffPlayBtn">▶ Играть</button>
+                    <span class="staff-time" id="staffTime">0.0s / 0.0s</span>
+                </div>
+            </div>
+       <div class="actions">
                 <a class="btn btn-download" id="downloadPdf" target="_blank">
                     📄 Скачать PDF (ноты)
                 </a>
@@ -437,22 +556,6 @@
                 </button>
             </div>
         </section>
-
-                <footer class="app-footer">
-            <div class="footer-block">
-                <span class="footer-label">Фронтенд</span>
-                <span class="footer-version" id="frontendVersion">5.0</span>
-                <span class="footer-status online" id="frontendStatus">●</span>
-            </div>
-            <div class="footer-block">
-                <span class="footer-api" id="apiStatus">API: проверка...</span>
-            </div>
-            <div class="footer-block">
-                <span class="footer-label">Бэкенд</span>
-                <span class="footer-version" id="backendVersion">—</span>
-                <span class="footer-status" id="backendStatus">●</span>
-            </div>
-        </footer>
     </div>
 
     <script>
@@ -471,6 +574,10 @@
         let pollInterval = null;
         let selectedFile = null;
 
+        let originalAudioUrl = null;
+        let staffNotes = [];
+        let staffDuration = 0;
+        let staffRafId = null;
         // ==========================================
         // DOM ELEMENTS
         // ==========================================
@@ -540,6 +647,11 @@
             fileSize.textContent = formatBytes(file.size);
             fileInfo.classList.add('visible');
             dropZone.style.display = 'none';
+
+            // Setup original audio preview
+            originalAudioUrl = URL.createObjectURL(file);
+            document.getElementById('originalPlayer').src = originalAudioUrl;
+            document.getElementById('originalAudioSection').classList.add('visible');
         }
 
         function formatBytes(bytes) {
@@ -706,6 +818,12 @@
                 const audioPlayer = document.getElementById('audioPlayer');
                 audioPlayer.src = API_BASE + '/download/' + currentJobId + '.wav';
 
+                // Staff notation - render melody on music staff
+                if (data.melody_rh && data.melody_rh.length > 0) {
+                    renderStaff(data.melody_rh || [], data.duration || 0);
+                    document.getElementById('staffSection').classList.add('visible');
+                }
+
                 // Download links
                 document.getElementById('downloadPdf').href = API_BASE + '/download/' + currentJobId + '.pdf';
                 document.getElementById('downloadWav').href = API_BASE + '/download/' + currentJobId + '.wav';
@@ -826,7 +944,232 @@
         // ==========================================
         // ERROR
         // ==========================================
-        function showError(message) {
+        
+        // ==========================================
+        // STAFF NOTATION (Real-time synced with original)
+        // ==========================================
+        function renderStaff(notes, duration) {
+            staffNotes = notes;
+            staffDuration = duration;
+            const svg = document.getElementById('staffSvg');
+            const PPS = 140; // pixels per second
+            const LM = 80;   // left margin for clef
+            const RM = 40;   // right margin
+            const W = Math.max(800, duration * PPS + LM + RM);
+            const H = 280;
+            const staffBaseY = 180; // E4 line position
+            const lineSpace = 12;   // pixels between staff lines
+
+            svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+            svg.style.width = W + 'px';
+            svg.style.height = H + 'px';
+            svg.innerHTML = '';
+
+            // Staff lines: E4(64), G4(67), B4(71), D5(74), F5(77)
+            const staffLinePitches = [64, 67, 71, 74, 77];
+            staffLinePitches.forEach(pitch => {
+                const y = staffBaseY - (pitch - 64) * lineSpace / 2;
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', LM - 10);
+                line.setAttribute('y1', y);
+                line.setAttribute('x2', W - RM);
+                line.setAttribute('y2', y);
+                line.setAttribute('class', 'staff-line');
+                svg.appendChild(line);
+            });
+
+            // G Clef (simplified glyph)
+            const clef = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            clef.setAttribute('x', 5);
+            clef.setAttribute('y', staffBaseY - 2 * lineSpace + 18);
+            clef.setAttribute('font-size', '52');
+            clef.setAttribute('fill', '#e2e8f0');
+            clef.setAttribute('font-family', 'serif');
+            clef.textContent = '𝄞';
+            svg.appendChild(clef);
+
+            // Time ruler (bottom)
+            for (let t = 0; t <= duration; t += 1) {
+                const x = LM + t * PPS;
+                const tick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                tick.setAttribute('x1', x);
+                tick.setAttribute('y1', H - 30);
+                tick.setAttribute('x2', x);
+                tick.setAttribute('y2', H - 20);
+                tick.setAttribute('stroke', '#475569');
+                tick.setAttribute('stroke-width', '1');
+                svg.appendChild(tick);
+
+                const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                label.setAttribute('x', x);
+                label.setAttribute('y', H - 8);
+                label.setAttribute('text-anchor', 'middle');
+                label.setAttribute('font-size', '10');
+                label.setAttribute('fill', '#64748b');
+                label.setAttribute('font-family', 'monospace');
+                label.textContent = t + 's';
+                svg.appendChild(label);
+            }
+
+            // Draw notes
+            notes.forEach((n, idx) => {
+                const x = LM + n.start * PPS;
+                const w = Math.max(10, n.dur * PPS);
+                const y = staffBaseY - (n.pitch - 64) * lineSpace / 2;
+
+                // Ledger lines for notes outside staff
+                if (n.pitch < 64) {
+                    for (let p = 62; p >= n.pitch; p -= 2) {
+                        const ly = staffBaseY - (p - 64) * lineSpace / 2;
+                        const ledger = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        ledger.setAttribute('x1', x - 6);
+                        ledger.setAttribute('y1', ly);
+                        ledger.setAttribute('x2', x + w + 6);
+                        ledger.setAttribute('y2', ly);
+                        ledger.setAttribute('class', 'ledger-line');
+                        svg.appendChild(ledger);
+                    }
+                }
+                if (n.pitch > 77) {
+                    for (let p = 79; p <= n.pitch; p += 2) {
+                        const ly = staffBaseY - (p - 64) * lineSpace / 2;
+                        const ledger = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        ledger.setAttribute('x1', x - 6);
+                        ledger.setAttribute('y1', ly);
+                        ledger.setAttribute('x2', x + w + 6);
+                        ledger.setAttribute('y2', ly);
+                        ledger.setAttribute('class', 'ledger-line');
+                        svg.appendChild(ledger);
+                    }
+                }
+
+                // Note ellipse
+                const ellipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+                ellipse.setAttribute('cx', x + w / 2);
+                ellipse.setAttribute('cy', y);
+                ellipse.setAttribute('rx', w / 2);
+                ellipse.setAttribute('ry', lineSpace * 0.75);
+                ellipse.setAttribute('class', 'staff-note');
+                ellipse.setAttribute('data-start', n.start);
+                ellipse.setAttribute('data-dur', n.dur);
+                ellipse.setAttribute('data-pitch', n.pitch);
+                ellipse.setAttribute('id', 'staff-note-' + idx);
+                ellipse.setAttribute('title', midiToName(n.pitch) + ' @ ' + n.start.toFixed(2) + 's');
+                svg.appendChild(ellipse);
+
+                // Sharp sign if needed
+                const noteNames = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+                const name = noteNames[n.pitch % 12];
+                if (name.includes('#')) {
+                    const sharp = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    sharp.setAttribute('x', x - 8);
+                    sharp.setAttribute('y', y + 4);
+                    sharp.setAttribute('font-size', '14');
+                    sharp.setAttribute('fill', '#e2e8f0');
+                    sharp.setAttribute('class', 'note-sharp');
+                    sharp.textContent = '♯';
+                    svg.appendChild(sharp);
+                }
+
+                // Note label (small)
+                const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                lbl.setAttribute('x', x + w / 2);
+                lbl.setAttribute('y', y - lineSpace);
+                lbl.setAttribute('text-anchor', 'middle');
+                lbl.setAttribute('font-size', '9');
+                lbl.setAttribute('fill', '#94a3b8');
+                lbl.setAttribute('font-family', 'monospace');
+                lbl.textContent = name;
+                svg.appendChild(lbl);
+            });
+
+            // Playhead line
+            const playhead = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            playhead.setAttribute('x1', LM);
+            playhead.setAttribute('y1', 10);
+            playhead.setAttribute('x2', LM);
+            playhead.setAttribute('y2', H - 35);
+            playhead.setAttribute('class', 'playhead');
+            playhead.setAttribute('id', 'staffPlayhead');
+            svg.appendChild(playhead);
+
+            // Playhead triangle marker
+            const marker = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            marker.setAttribute('points', `${LM-6},10 ${LM+6},10 ${LM},18`);
+            marker.setAttribute('fill', '#ef4444');
+            marker.setAttribute('id', 'staffPlayheadMarker');
+            svg.appendChild(marker);
+
+            // Setup sync
+            setupStaffSync(PPS, LM, duration);
+        }
+
+        function setupStaffSync(pps, lm, duration) {
+            const player = document.getElementById('originalPlayer');
+            const container = document.getElementById('staffContainer');
+            const playhead = document.getElementById('staffPlayhead');
+            const marker = document.getElementById('staffPlayheadMarker');
+            const timeDisplay = document.getElementById('staffTime');
+            const notes = document.querySelectorAll('.staff-note');
+
+            function update() {
+                if (!player.paused && staffDuration > 0) {
+                    const t = Math.min(player.currentTime, staffDuration);
+                    const x = lm + t * pps;
+
+                    // Scroll to keep playhead centered
+                    const targetScroll = x - container.clientWidth / 2;
+                    container.scrollLeft += (targetScroll - container.scrollLeft) * 0.1;
+
+                    // Move playhead
+                    playhead.setAttribute('x1', x);
+                    playhead.setAttribute('x2', x);
+                    marker.setAttribute('points', `${x-6},10 ${x+6},10 ${x},18`);
+
+                    // Highlight active notes
+                    notes.forEach(n => {
+                        const ns = parseFloat(n.getAttribute('data-start'));
+                        const nd = parseFloat(n.getAttribute('data-dur'));
+                        if (t >= ns && t <= ns + nd) {
+                            n.classList.add('active');
+                        } else {
+                            n.classList.remove('active');
+                        }
+                    });
+
+                    timeDisplay.textContent = t.toFixed(1) + 's / ' + staffDuration.toFixed(1) + 's';
+                }
+                staffRafId = requestAnimationFrame(update);
+            }
+
+            if (staffRafId) cancelAnimationFrame(staffRafId);
+            staffRafId = requestAnimationFrame(update);
+
+            // Update button state
+            const btn = document.getElementById('staffPlayBtn');
+            player.addEventListener('play', () => { btn.textContent = '⏸ Пауза'; });
+            player.addEventListener('pause', () => { btn.textContent = '▶ Играть'; });
+            player.addEventListener('ended', () => { btn.textContent = '▶ Играть'; });
+        }
+
+        function syncStaffToStart() {
+            const player = document.getElementById('originalPlayer');
+            player.currentTime = 0;
+            const container = document.getElementById('staffContainer');
+            container.scrollLeft = 0;
+            document.getElementById('staffTime').textContent = '0.0s / ' + staffDuration.toFixed(1) + 's';
+        }
+
+        function toggleStaffPlay() {
+            const player = document.getElementById('originalPlayer');
+            if (player.paused) {
+                player.play();
+            } else {
+                player.pause();
+            }
+        }
+
+function showError(message) {
             errorText.textContent = message;
             debugInfo.textContent = 'Debug: API_BASE=' + API_BASE + '\njob_id=' + (currentJobId || 'null');
             errorSection.classList.add('visible');
@@ -838,32 +1181,13 @@
         // ==========================================
         // HEALTH CHECK
         // ==========================================
-async function checkHealth() {
-            const backendStatus = document.getElementById('backendStatus');
-            const backendVersion = document.getElementById('backendVersion');
-            const apiStatus = document.getElementById('apiStatus');
-            const frontendStatus = document.getElementById('frontendStatus');
-
-            frontendStatus.className = 'footer-status online';
-            frontendStatus.title = 'Фронтенд загружен';
-
+        async function checkHealth() {
             try {
                 const res = await fetch(API_BASE + '/', { method: 'GET' });
                 const data = await res.json();
                 console.log('API Health:', data);
-
-                backendVersion.textContent = data.version || '?.?.?';
-                backendStatus.className = 'footer-status online';
-                backendStatus.title = `Движок: ${data.engine || 'unknown'}`;
-                apiStatus.textContent = `API: ${data.status || 'ok'}`;
-                apiStatus.style.color = 'var(--success)';
             } catch (err) {
                 console.warn('API недоступен:', err.message);
-                backendVersion.textContent = '—';
-                backendStatus.className = 'footer-status offline';
-                backendStatus.title = 'API недоступен';
-                apiStatus.textContent = 'API: offline';
-                apiStatus.style.color = 'var(--danger)';
             }
         }
 
