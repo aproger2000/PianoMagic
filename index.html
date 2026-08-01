@@ -6,17 +6,10 @@
 <title>PianoMagic v4.2</title>
 <style>
 :root {
-    --bg: #FFFFFF;
-    --bg-secondary: #F5F5F7;
-    --card: #FFFFFF;
-    --text: #1D1D1F;
-    --text2: #86868B;
-    --accent: #555555;
-    --accent-light: #8E8E93;
-    --success: #34C759;
-    --error: #FF3B30;
-    --warning: #FF9500;
-    --border: rgba(0,0,0,0.06);
+    --bg: #FFFFFF; --bg-secondary: #F5F5F7; --card: #FFFFFF;
+    --text: #1D1D1F; --text2: #86868B; --accent: #555555;
+    --accent-light: #8E8E93; --success: #34C759; --error: #FF3B30;
+    --warning: #FF9500; --border: rgba(0,0,0,0.06);
     --shadow: 0 2px 16px rgba(0,0,0,0.06);
     --shadow-hover: 0 8px 32px rgba(0,0,0,0.10);
     --metallic: linear-gradient(135deg, #E8E8ED 0%, #D1D1D6 50%, #E8E8ED 100%);
@@ -29,14 +22,10 @@ body {
     min-height: 100vh; display: flex; flex-direction: column; align-items: center;
     padding: 40px 16px 24px; -webkit-font-smoothing: antialiased;
 }
-
-/* Logo */
 .logo-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 36px; }
 .logo-svg { width: 72px; height: 72px; filter: drop-shadow(0 6px 16px rgba(0,0,0,0.12)); }
 .brand { font-size: 28px; font-weight: 700; letter-spacing: -0.6px; color: var(--text); }
 .tagline { font-size: 13px; color: var(--text2); font-weight: 500; letter-spacing: 0.2px; margin-top: -4px; }
-
-/* Card */
 .card {
     width: 100%; max-width: 480px; background: var(--card);
     border-radius: 24px; box-shadow: var(--shadow); padding: 28px;
@@ -44,136 +33,61 @@ body {
     transition: box-shadow 0.3s ease;
 }
 .card:hover { box-shadow: var(--shadow-hover); }
-
-/* Drop zone */
 .drop-zone {
     width: 100%; height: 170px; border: 2px dashed var(--border); border-radius: 20px;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
     cursor: pointer; transition: all 0.35s cubic-bezier(0.25, 0.1, 0.25, 1); background: var(--bg-secondary);
 }
-.drop-zone:hover {
-    border-color: rgba(0,0,0,0.15);
-    background: linear-gradient(135deg, #F5F5F7, #ECECF0);
-    transform: scale(1.01);
-}
-.drop-zone.drag-active {
-    border-color: #636366;
-    background: linear-gradient(135deg, #ECECF0, #E0E0E5);
-}
+.drop-zone:hover { border-color: rgba(0,0,0,0.15); background: linear-gradient(135deg, #F5F5F7, #ECECF0); transform: scale(1.01); }
+.drop-zone.drag-active { border-color: #636366; background: linear-gradient(135deg, #ECECF0, #E0E0E5); }
 .drop-zone input { display: none; }
 .drop-icon {
-    width: 52px; height: 52px;
-    background: var(--metallic-dark);
-    border-radius: 14px; display: flex; align-items: center; justify-content: center;
-    color: white; font-size: 22px;
+    width: 52px; height: 52px; background: var(--metallic-dark); border-radius: 14px;
+    display: flex; align-items: center; justify-content: center; color: white; font-size: 22px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 .drop-title { font-size: 16px; font-weight: 600; color: var(--text); }
 .drop-hint { font-size: 12px; color: var(--text2); font-weight: 500; }
-
-/* Progress */
 .progress-area { display: none; margin-top: 24px; }
 .progress-area.active { display: block; }
-.progress-header {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 10px;
-}
+.progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .progress-label { font-size: 14px; font-weight: 500; color: var(--text); }
 .progress-percent { font-size: 13px; font-weight: 600; color: var(--accent); font-family: "SF Mono", SFMono-Regular, monospace; }
-.progress-track {
-    width: 100%; height: 5px; background: rgba(0,0,0,0.05);
-    border-radius: 3px; overflow: hidden;
-}
-.progress-fill {
-    height: 100%;
-    background: var(--metallic-dark);
-    border-radius: 3px; width: 0%;
-    transition: width 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
-}
-
-/* Visuals */
+.progress-track { width: 100%; height: 5px; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--metallic-dark); border-radius: 3px; width: 0%; transition: width 0.5s cubic-bezier(0.25, 0.1, 0.25, 1); }
 .visuals { display: none; margin-top: 24px; }
 .visuals.active { display: block; }
 .vis-title { font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-
-#spectrogram {
-    width: 100%; height: 170px; background: #0a0a12;
-    border-radius: 16px; margin-bottom: 20px;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-}
-#staff {
-    width: 100%; height: 180px; background: var(--bg-secondary);
-    border-radius: 16px; margin-bottom: 20px;
-    border: 1px solid var(--border);
-}
-
-/* Controls */
-.controls { display: flex; gap: 10px; margin-top: 16px; }
+#spectrogram { width: 100%; height: 200px; background: #0a0a12; border-radius: 16px; margin-bottom: 20px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+#staff { width: 100%; height: 180px; background: var(--bg-secondary); border-radius: 16px; margin-bottom: 20px; border: 1px solid var(--border); }
+.controls { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
 .btn {
-    flex: 1; padding: 14px; border: none; border-radius: 14px;
+    flex: 1; min-width: 120px; padding: 14px; border: none; border-radius: 14px;
     font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1); text-align: center;
-    letter-spacing: -0.2px;
+    transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1); text-align: center; letter-spacing: -0.2px;
 }
-.btn-primary {
-    background: var(--metallic-dark);
-    color: white;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-}
+.btn-primary { background: var(--metallic-dark); color: white; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
 .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
 .btn-primary:active { transform: translateY(0); }
-.btn-secondary {
-    background: var(--bg-secondary); color: var(--text);
-    border: 1px solid var(--border);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-}
+.btn-secondary { background: var(--bg-secondary); color: var(--text); border: 1px solid var(--border); box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
 .btn-secondary:hover { background: #ECECF0; transform: translateY(-1px); }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
-
-/* Footer */
-.footer {
-    margin-top: auto; padding-top: 32px; text-align: center; width: 100%; max-width: 480px;
-}
+.footer { margin-top: auto; padding-top: 32px; text-align: center; width: 100%; max-width: 480px; }
 .status-bar {
     display: inline-flex; align-items: center; gap: 16px;
     background: var(--card); padding: 8px 18px; border-radius: 100px;
     box-shadow: var(--shadow); border: 1px solid var(--border);
-    font-size: 12px; color: var(--text2);
-    font-family: "SF Mono", SFMono-Regular, monospace;
+    font-size: 12px; color: var(--text2); font-family: "SF Mono", SFMono-Regular, monospace;
 }
 .status-item { display: inline-flex; align-items: center; gap: 6px; }
-.status-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: #C7C7CC;
-    transition: background 0.4s ease, box-shadow 0.4s ease;
-    position: relative;
-}
-.status-dot.green {
-    background: var(--success);
-    box-shadow: 0 0 6px rgba(52,199,89,0.4);
-}
-.status-dot.red {
-    background: var(--error);
-    box-shadow: 0 0 6px rgba(255,59,48,0.4);
-    animation: pulse-red 2s infinite;
-}
-.status-dot.gray {
-    background: #C7C7CC;
-    box-shadow: none;
-}
-@keyframes pulse-red {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
-}
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: #C7C7CC; transition: background 0.4s ease, box-shadow 0.4s ease; position: relative; }
+.status-dot.green { background: var(--success); box-shadow: 0 0 6px rgba(52,199,89,0.4); }
+.status-dot.red { background: var(--error); box-shadow: 0 0 6px rgba(255,59,48,0.4); animation: pulse-red 2s infinite; }
+.status-dot.gray { background: #C7C7CC; box-shadow: none; }
+@keyframes pulse-red { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 .status-label { font-weight: 600; color: var(--text); }
 .status-ver { opacity: 0.7; }
 .status-sep { opacity: 0.25; }
-
-/* Subtle loading shimmer for drop zone */
-@keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-}
 </style>
 </head>
 <body>
@@ -184,13 +98,7 @@ body {
         <rect x="20" y="18" width="7" height="32" rx="2" fill="white" opacity="0.95"/>
         <rect x="37" y="22" width="7" height="28" rx="2" fill="white" opacity="0.6"/>
         <circle cx="44" cy="16" r="4" fill="white"/>
-        <defs>
-            <linearGradient id="lg" x1="0" y1="0" x2="64" y2="64">
-                <stop stop-color="#8E8E93"/>
-                <stop offset="0.5" stop-color="#636366"/>
-                <stop offset="1" stop-color="#48484A"/>
-            </linearGradient>
-        </defs>
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="64" y2="64"><stop stop-color="#8E8E93"/><stop offset="0.5" stop-color="#636366"/><stop offset="1" stop-color="#48484A"/></linearGradient></defs>
     </svg>
     <div class="brand">PianoMagic</div>
     <div class="tagline">FFT · Мелодия · Ноты</div>
@@ -209,13 +117,11 @@ body {
             <span class="progress-label" id="progressLabel">Загрузка...</span>
             <span class="progress-percent" id="progressPercent">0%</span>
         </div>
-        <div class="progress-track">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
     </div>
 
     <div class="visuals" id="visuals">
-        <div class="vis-title">Спектрограмма (FFT, 50мс)</div>
+        <div class="vis-title">Спектрограмма (STFT)</div>
         <canvas id="spectrogram"></canvas>
 
         <div class="vis-title">Извлечённая мелодия</div>
@@ -223,6 +129,7 @@ body {
 
         <div class="controls">
             <button class="btn btn-secondary" id="btnPlay">▶ Прослушать</button>
+            <button class="btn btn-secondary" id="btnWav" disabled>🔊 Скачать WAV</button>
             <button class="btn btn-primary" id="btnRender" disabled>📄 Скачать PDF</button>
         </div>
     </div>
@@ -230,17 +137,9 @@ body {
 
 <div class="footer">
     <div class="status-bar">
-        <div class="status-item">
-            <div class="status-dot gray" id="feDot"></div>
-            <span class="status-label">FE</span>
-            <span class="status-ver">4.2.0</span>
-        </div>
+        <div class="status-item"><div class="status-dot gray" id="feDot"></div><span class="status-label">FE</span><span class="status-ver">4.2.1</span></div>
         <span class="status-sep">|</span>
-        <div class="status-item">
-            <div class="status-dot gray" id="beDot"></div>
-            <span class="status-label">BE</span>
-            <span class="status-ver" id="beVer">—</span>
-        </div>
+        <div class="status-item"><div class="status-dot gray" id="beDot"></div><span class="status-label">BE</span><span class="status-ver" id="beVer">—</span></div>
     </div>
 </div>
 
@@ -249,58 +148,34 @@ const API = 'https://pianomagic-api.onrender.com';
 let currentJobId = null;
 let melodyData = null;
 let fftData = null;
+let specData = null;
 let audioCtx = null;
 let beCheckInterval = null;
 
-// ── Status indicators ─────────────────────────────────────────────
 const feDot = document.getElementById('feDot');
 const beDot = document.getElementById('beDot');
 const beVer = document.getElementById('beVer');
 
-function setDot(el, state) {
-    el.classList.remove('green', 'red', 'gray');
-    el.classList.add(state);
-}
+function setDot(el, state) { el.classList.remove('green','red','gray'); el.classList.add(state); }
 
-// FE status: page loaded + required APIs available
 function checkFE() {
-    try {
-        const ok = !!(window.fetch && window.AudioContext && document.createElement('canvas').getContext('2d'));
-        setDot(feDot, ok ? 'green' : 'red');
-    } catch (e) {
-        setDot(feDot, 'red');
-    }
+    try { setDot(feDot, (window.fetch && window.AudioContext) ? 'green' : 'red'); }
+    catch(e) { setDot(feDot, 'red'); }
 }
-
-// BE status: ping health endpoint
 async function checkBE() {
     try {
         const ctrl = new AbortController();
-        const to = setTimeout(() => ctrl.abort(), 8000);
+        const to = setTimeout(()=>ctrl.abort(), 8000);
         const r = await fetch(`${API}/`, { signal: ctrl.signal });
         clearTimeout(to);
-        if (r.ok) {
-            const d = await r.json().catch(() => null);
-            setDot(beDot, 'green');
-            beVer.textContent = (d && d.version) ? d.version : 'ok';
-        } else {
-            setDot(beDot, 'red');
-            beVer.textContent = 'err';
-        }
-    } catch (e) {
-        setDot(beDot, 'red');
-        beVer.textContent = 'off';
-    }
+        if (r.ok) { const d = await r.json().catch(()=>null); setDot(beDot, 'green'); beVer.textContent = (d && d.version) ? d.version : 'ok'; }
+        else { setDot(beDot, 'red'); beVer.textContent = 'err'; }
+    } catch(e) { setDot(beDot, 'red'); beVer.textContent = 'off'; }
 }
+checkFE(); checkBE(); beCheckInterval = setInterval(checkBE, 15000);
+window.addEventListener('error', ()=>setDot(feDot,'red'));
+window.addEventListener('unhandledrejection', ()=>setDot(feDot,'red'));
 
-checkFE();
-checkBE();
-beCheckInterval = setInterval(checkBE, 15000);
-
-window.addEventListener('error', () => setDot(feDot, 'red'));
-window.addEventListener('unhandledrejection', () => setDot(feDot, 'red'));
-
-// ── DOM refs ──────────────────────────────────────────────────────
 const dropZone = document.getElementById('dropZone');
 const fileInput = document.getElementById('fileInput');
 const progressArea = document.getElementById('progressArea');
@@ -309,6 +184,7 @@ const progressPercent = document.getElementById('progressPercent');
 const progressFill = document.getElementById('progressFill');
 const visuals = document.getElementById('visuals');
 const btnPlay = document.getElementById('btnPlay');
+const btnWav = document.getElementById('btnWav');
 const btnRender = document.getElementById('btnRender');
 
 function setProgress(text, percent) {
@@ -319,26 +195,19 @@ function setProgress(text, percent) {
 }
 function hideProgress() { progressArea.classList.remove('active'); }
 
-// ── Drag & drop ───────────────────────────────────────────────────
 dropZone.addEventListener('click', () => fileInput.click());
-['dragover','dragenter'].forEach(e => dropZone.addEventListener(e, ev => {
-    ev.preventDefault();
-    dropZone.classList.add('drag-active');
-}));
+['dragover','dragenter'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('drag-active'); }));
 ['dragleave','drop'].forEach(e => dropZone.addEventListener(e, ev => {
-    ev.preventDefault();
-    dropZone.classList.remove('drag-active');
+    ev.preventDefault(); dropZone.classList.remove('drag-active');
     if (e === 'drop' && ev.dataTransfer.files.length) handleFile(ev.dataTransfer.files[0]);
 }));
 fileInput.addEventListener('change', e => { if (e.target.files.length) handleFile(e.target.files[0]); });
 
-// ── File handling ─────────────────────────────────────────────────
 function handleFile(file) {
     const valid = /\.(mp3|wav|flac|m4a|ogg)$/i.test(file.name);
     if (!valid) { alert('Выберите аудиофайл'); return; }
-
     visuals.classList.remove('active');
-    btnRender.disabled = true;
+    btnRender.disabled = true; btnWav.disabled = true;
     btnPlay.textContent = '▶ Прослушать';
     setProgress('Загрузка файла...', 5);
 
@@ -346,25 +215,11 @@ function handleFile(file) {
     formData.append('file', file);
 
     fetch(`${API}/analyze`, { method: 'POST', body: formData })
-        .then(r => {
-            if (!r.ok) throw new Error('HTTP ' + r.status);
-            return r.json();
-        })
-        .then(data => {
-            if (data.job_id) {
-                currentJobId = data.job_id;
-                pollStatus(data.job_id);
-            } else {
-                throw new Error('No job_id');
-            }
-        })
-        .catch(err => {
-            setProgress('Ошибка загрузки', 0);
-            alert('Ошибка загрузки: ' + err.message);
-        });
+        .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+        .then(data => { if (data.job_id) { currentJobId = data.job_id; pollStatus(data.job_id); } else throw new Error('No job_id'); })
+        .catch(err => { setProgress('Ошибка загрузки', 0); alert('Ошибка загрузки: ' + err.message); });
 }
 
-// ── Polling ────────────────────────────────────────────────────────
 function pollStatus(jobId) {
     const iv = setInterval(() => {
         fetch(`${API}/status/${jobId}`)
@@ -372,17 +227,9 @@ function pollStatus(jobId) {
             .then(data => {
                 if (!data) return;
                 setProgress(data.stage_text || 'Обработка...', data.progress || 0);
-
-                if (data.status === 'analyzed') {
-                    clearInterval(iv);
-                    hideProgress();
-                    loadMelody(jobId);
-                } else if (data.status === 'failed') {
-                    clearInterval(iv);
-                    setProgress('Ошибка: ' + (data.error || 'unknown'), 0);
-                }
-            })
-            .catch(() => {});
+                if (data.status === 'analyzed') { clearInterval(iv); hideProgress(); loadMelody(jobId); }
+                else if (data.status === 'failed') { clearInterval(iv); setProgress('Ошибка: '+(data.error||'unknown'), 0); }
+            }).catch(()=>{});
     }, 1500);
 }
 
@@ -392,18 +239,18 @@ function loadMelody(jobId) {
         .then(data => {
             melodyData = data.melody;
             fftData = data.fft;
+            specData = data.spec;
             visuals.classList.add('active');
-            drawSpectrogram(fftData);
+            drawSpectrogram(specData);
             drawStaff(melodyData);
             btnRender.disabled = false;
+            btnWav.disabled = false;
         })
-        .catch(err => {
-            alert('Ошибка загрузки мелодии: ' + err.message);
-        });
+        .catch(err => { alert('Ошибка загрузки мелодии: '+err.message); });
 }
 
-// ── Spectrogram ───────────────────────────────────────────────────
-function drawSpectrogram(frames) {
+// ── 2D Spectrogram Heatmap ─────────────────────────────────────────
+function drawSpectrogram(specMatrix) {
     const canvas = document.getElementById('spectrogram');
     const ctx = canvas.getContext('2d');
     const dpr = window.devicePixelRatio || 1;
@@ -412,23 +259,40 @@ function drawSpectrogram(frames) {
     canvas.width = w * dpr; canvas.height = h * dpr;
     ctx.scale(dpr, dpr);
 
-    ctx.fillStyle = '#0a0a12';
-    ctx.fillRect(0, 0, w, h);
+    if (!specMatrix || specMatrix.length === 0 || specMatrix[0].length === 0) {
+        ctx.fillStyle = '#0a0a12'; ctx.fillRect(0,0,w,h); return;
+    }
 
-    if (!frames || frames.length === 0) return;
+    const freqs = specMatrix.length;
+    const times = specMatrix[0].length;
+    const cellW = w / times;
+    const cellH = h / freqs;
 
-    const barW = w / frames.length;
-    frames.forEach((f, i) => {
-        const amp = Math.max(0, Math.min(1, f.amp || 0));
-        const bright = Math.pow(amp, 0.5) * 90;
-        const hue = 210 + amp * 40; // steel-blue to warm silver
-        ctx.fillStyle = `hsl(${hue}, 20%, ${bright}%)`;
-        const bh = Math.max(2, amp * h * 0.92);
-        ctx.fillRect(i * barW, h - bh, Math.max(1, barW - 0.5), bh);
-    });
+    // Find min/max for normalization
+    let minVal = Infinity, maxVal = -Infinity;
+    for (let i = 0; i < freqs; i++) {
+        for (let j = 0; j < times; j++) {
+            const v = specMatrix[i][j];
+            if (v < minVal) minVal = v;
+            if (v > maxVal) maxVal = v;
+        }
+    }
+    const range = maxVal - minVal || 1;
+
+    for (let i = 0; i < freqs; i++) {
+        for (let j = 0; j < times; j++) {
+            const norm = (specMatrix[i][j] - minVal) / range;
+            // Steel/fire colormap: dark -> purple -> orange -> white
+            const r = Math.min(255, norm * 400);
+            const g = Math.min(255, norm * norm * 300);
+            const b = Math.min(255, 50 + norm * 150);
+            ctx.fillStyle = `rgb(${Math.floor(r)},${Math.floor(g)},${Math.floor(b)})`;
+            ctx.fillRect(j * cellW, h - (i+1) * cellH, cellW + 0.5, cellH + 0.5);
+        }
+    }
 }
 
-// ── Staff ─────────────────────────────────────────────────────────
+// ── Staff ──────────────────────────────────────────────────────────
 function drawStaff(notes) {
     const svg = document.getElementById('staff');
     svg.innerHTML = '';
@@ -437,62 +301,60 @@ function drawStaff(notes) {
 
     lineY.forEach(y => {
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', '60'); line.setAttribute('y1', y);
-        line.setAttribute('x2', w - 10); line.setAttribute('y2', y);
-        line.setAttribute('stroke', '#1D1D1F'); line.setAttribute('stroke-width', '1.2');
+        line.setAttribute('x1','60'); line.setAttribute('y1',y);
+        line.setAttribute('x2',w-10); line.setAttribute('y2',y);
+        line.setAttribute('stroke','#1D1D1F'); line.setAttribute('stroke-width','1.2');
         svg.appendChild(line);
     });
 
-    const clef = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    clef.setAttribute('x', '15'); clef.setAttribute('y', '95');
-    clef.setAttribute('font-size', '42'); clef.setAttribute('font-family', 'serif');
+    const clef = document.createElementNS('http://www.w3.org/2000/svg','text');
+    clef.setAttribute('x','15'); clef.setAttribute('y','95');
+    clef.setAttribute('font-size','42'); clef.setAttribute('font-family','serif');
     clef.textContent = '𝄞';
     svg.appendChild(clef);
 
     if (!notes || notes.length === 0) return;
 
-    const totalTime = notes.reduce((s, n) => s + n.dur, 0) * 1.2;
+    const totalTime = notes.reduce((s,n)=>s+n.dur,0) * 1.2;
     const xScale = (w - 80) / Math.max(totalTime, 4);
     let x = 70;
-
     const midiToY = (midi) => 110 - (midi - 60) * 3.5;
 
-    notes.forEach((n) => {
+    notes.forEach(n => {
         const y = midiToY(n.pitch);
         const noteW = Math.max(20, n.dur * xScale * 0.8);
 
-        const note = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-        note.setAttribute('cx', x + noteW / 2); note.setAttribute('cy', y);
-        note.setAttribute('rx', noteW / 2); note.setAttribute('ry', '5');
-        note.setAttribute('fill', '#1D1D1F');
+        const note = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+        note.setAttribute('cx', x + noteW/2); note.setAttribute('cy', y);
+        note.setAttribute('rx', noteW/2); note.setAttribute('ry','5');
+        note.setAttribute('fill','#1D1D1F');
         svg.appendChild(note);
 
         const stemDir = y > 80 ? -1 : 1;
-        const stem = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        const stem = document.createElementNS('http://www.w3.org/2000/svg','line');
         stem.setAttribute('x1', x + noteW - 2); stem.setAttribute('y1', y);
         stem.setAttribute('x2', x + noteW - 2); stem.setAttribute('y2', y + stemDir * 30);
-        stem.setAttribute('stroke', '#1D1D1F'); stem.setAttribute('stroke-width', '1.5');
+        stem.setAttribute('stroke','#1D1D1F'); stem.setAttribute('stroke-width','1.5');
         svg.appendChild(stem);
 
         if (n.pitch >= 77) {
             for (let ly = 50; ly > y; ly -= 15) {
-                const ll = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                ll.setAttribute('x1', x); ll.setAttribute('y1', ly);
-                ll.setAttribute('x2', x + noteW); ll.setAttribute('y2', ly);
-                ll.setAttribute('stroke', '#1D1D1F'); ll.setAttribute('stroke-width', '0.8');
+                const ll = document.createElementNS('http://www.w3.org/2000/svg','line');
+                ll.setAttribute('x1',x); ll.setAttribute('y1',ly);
+                ll.setAttribute('x2',x+noteW); ll.setAttribute('y2',ly);
+                ll.setAttribute('stroke','#1D1D1F'); ll.setAttribute('stroke-width','0.8');
                 svg.appendChild(ll);
             }
         }
         if (n.pitch <= 56) {
             for (let ly = 110; ly < y; ly += 15) {
-                const ll = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                ll.setAttribute('x1', x); ll.setAttribute('y1', ly);
-                ll.setAttribute('x2', x + noteW); ll.setAttribute('y2', ly);
-                ll.setAttribute('stroke', '#1D1D1F'); ll.setAttribute('stroke-width', '0.8');
+                const ll = document.createElementNS('http://www.w3.org/2000/svg','line');
+                ll.setAttribute('x1',x); ll.setAttribute('y1',ly);
+                ll.setAttribute('x2',x+noteW); ll.setAttribute('y2',ly);
+                ll.setAttribute('stroke','#1D1D1F'); ll.setAttribute('stroke-width','0.8');
                 svg.appendChild(ll);
             }
         }
-
         x += noteW + 8;
     });
 }
@@ -501,68 +363,44 @@ function drawStaff(notes) {
 function playMelody() {
     if (!melodyData || melodyData.length === 0) return;
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
     const now = audioCtx.currentTime;
     let t = now;
-
     melodyData.forEach(n => {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         const freq = 440 * Math.pow(2, (n.pitch - 69) / 12);
-
         osc.type = 'sine';
         osc.frequency.value = freq;
         gain.gain.setValueAtTime(0.25, t);
         gain.gain.exponentialRampToValueAtTime(0.01, t + n.dur * 0.9);
-
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(t);
-        osc.stop(t + n.dur);
-
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(t); osc.stop(t + n.dur);
         t += n.dur;
     });
-
     btnPlay.textContent = '⏸ Остановить';
     setTimeout(() => { btnPlay.textContent = '▶ Прослушать'; }, (t - now) * 1000);
 }
-
 btnPlay.addEventListener('click', () => {
-    if (audioCtx && audioCtx.state === 'running') {
-        audioCtx.suspend();
-        btnPlay.textContent = '▶ Прослушать';
-    } else {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        audioCtx.resume();
-        playMelody();
-    }
+    if (audioCtx && audioCtx.state === 'running') { audioCtx.suspend(); btnPlay.textContent = '▶ Прослушать'; }
+    else { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); audioCtx.resume(); playMelody(); }
 });
 
-// ── Render PDF ──────────────────────────────────────────────────
+// ── Download handlers ─────────────────────────────────────────────
 btnRender.addEventListener('click', () => {
     if (!currentJobId) return;
-    btnRender.disabled = true;
-    btnRender.textContent = '⏳ Рендер...';
-
+    btnRender.disabled = true; btnRender.textContent = '⏳ Рендер...';
     fetch(`${API}/render/${currentJobId}`, { method: 'POST' })
-        .then(r => {
-            if (!r.ok) throw new Error('HTTP ' + r.status);
-            return r.json();
-        })
+        .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
         .then(data => {
-            if (data.status === 'completed') {
-                window.location.href = `${API}/download/${currentJobId}.pdf`;
-                btnRender.textContent = '📄 Скачать PDF';
-                btnRender.disabled = false;
-            } else {
-                throw new Error('Render failed');
-            }
+            if (data.status === 'completed') { window.location.href = `${API}/download/${currentJobId}.pdf`; btnRender.textContent = '📄 Скачать PDF'; btnRender.disabled = false; }
+            else throw new Error('Render failed');
         })
-        .catch(err => {
-            alert('Ошибка рендера: ' + err.message);
-            btnRender.textContent = '📄 Скачать PDF';
-            btnRender.disabled = false;
-        });
+        .catch(err => { alert('Ошибка рендера: '+err.message); btnRender.textContent = '📄 Скачать PDF'; btnRender.disabled = false; });
+});
+
+btnWav.addEventListener('click', () => {
+    if (!currentJobId) return;
+    window.location.href = `${API}/download/${currentJobId}.wav`;
 });
 </script>
 </body>
