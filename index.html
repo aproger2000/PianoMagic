@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PianoMagic 6.3 — Аудио в ноты</title>
+    <title>PianoMagic 6.1 — Аудио в ноты</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -572,7 +572,7 @@
     <div class="container">
         <header>
             <h1>🎹 PianoMagic</h1>
-            <div class="version">Версия 6.3 — Universal Melody Fitter</div>
+            <div class="version">Версия 6.1 — Universal Melody Fitter</div>
             <p>Загрузите любую мелодию — получите фортепианную партию для двух рук</p>
         </header>
 
@@ -1470,7 +1470,7 @@
             }
         }
 
-        function showError(message) {
+function showError(message) {
             errorText.textContent = message;
             debugInfo.textContent = 'Debug: API_BASE=' + API_BASE + '\njob_id=' + (currentJobId || 'null');
             errorSection.classList.add('visible');
@@ -1521,24 +1521,13 @@
                 }
             }
         }
-        
-        function checkHealth() {
-            try {
-                const res = await fetch(API_BASE + '/', { method: 'GET' });
-                const data = await res.json();
-                console.log('API Health:', data);
-            } catch (err) {
-                console.warn('API недоступен:', err.message);
-            }
-        }
-
         checkHealth();
     </script>
 
         <footer class="app-footer" id="appFooter">
             <div class="footer-block">
                 <span class="footer-label">Фронтенд</span>
-                <span class="footer-version" id="frontendVersion">6.3</span>
+                <span class="footer-version" id="frontendVersion">6.1</span>
                 <span class="footer-status online" id="frontendStatus" title="Фронтенд загружен"></span>
             </div>
             <div class="footer-block">
