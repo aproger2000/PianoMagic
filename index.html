@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PianoMagic 5.0 — Аудио в ноты</title>
+    <title>PianoMagic 6.1 — Аудио в ноты</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -492,13 +492,87 @@
         }
         .footer-api.online { color: var(--success); }
         .footer-api.offline { color: var(--danger); }
+
+        /* ===== CHROMA HISTOGRAMS ===== */
+        .chroma-section {
+            display: none;
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        .chroma-section.visible { display: block; }
+        .chroma-section h3 {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .chroma-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        .chroma-card {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+        .chroma-card h4 {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .chroma-canvas-wrap {
+            height: 220px;
+            position: relative;
+        }
+        .chroma-canvas {
+            width: 100%;
+            height: 100%;
+        }
+        .chroma-correlation {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 18px;
+            background: var(--bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-top: 5px;
+        }
+        .chroma-correlation-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+        .chroma-correlation-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+        }
+        .chroma-correlation-value.good { color: var(--success); }
+        .chroma-correlation-value.warning { color: var(--warning); }
+        .chroma-correlation-value.bad { color: var(--danger); }
+        .chroma-correlation-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        @media (max-width: 768px) {
+            .chroma-grid { grid-template-columns: 1fr; }
+        }
 </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>🎹 PianoMagic</h1>
-            <div class="version">Версия 5.0 — Universal Melody Fitter</div>
+            <div class="version">Версия 6.1 — Universal Melody Fitter</div>
             <p>Загрузите любую мелодию — получите фортепианную партию для двух рук</p>
         </header>
 
@@ -621,6 +695,29 @@
                 </button>
             </div>
         </section>
+            <div class="chroma-section" id="chromaSection">
+                <h3>📊 Хромаграммное сравнение</h3>
+                <div class="chroma-grid">
+                    <div class="chroma-card">
+                        <h4>🎵 Исходная композиция</h4>
+                        <div class="chroma-canvas-wrap">
+                            <canvas id="chromaOrigCanvas" class="chroma-canvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="chroma-card">
+                        <h4>🎹 Подбор PianoMagic</h4>
+                        <div class="chroma-canvas-wrap">
+                            <canvas id="chromaSynthCanvas" class="chroma-canvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="chroma-correlation">
+                        <div class="chroma-correlation-label">Корреляция Пирсона</div>
+                        <div class="chroma-correlation-value" id="chromaCorrValue">—</div>
+                        <div class="chroma-correlation-desc" id="chromaCorrDesc">Сходство тонального профиля</div>
+                    </div>
+                </div>
+            </div>
+
     </div>
 
     <script>
@@ -874,6 +971,12 @@
                     drawSpectrogram(data.spec);
                 }
 
+                // Chroma histograms
+                if (data.chroma_orig && data.chroma_synth) {
+                    drawChromaHistograms(data.chroma_orig, data.chroma_synth);
+                    document.getElementById('chromaSection').classList.add('visible');
+                }
+
                 // Piano Roll
                 if (data.melody_rh || data.melody_lh) {
                     drawPianoRoll(data.melody_rh || [], data.melody_lh || [], data.duration);
@@ -905,6 +1008,119 @@
         // ==========================================
         // VISUALIZATIONS
         // ==========================================
+        function drawChromaHistograms(chromaOrig, chromaSynth) {
+            const noteLabels = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+            const colorsOrig = ['#6366f1','#818cf8','#a5b4fc','#c7d2fe','#ddd6fe',
+                                '#8b5cf6','#a78bfa','#c4b5fd','#a855f7','#d8b4fe',
+                                '#e879f9','#f0abfc'];
+            const colorsSynth = ['#f59e0b','#fbbf24','#fcd34d','#fde68a','#fef3c7',
+                                 '#d97706','#b45309','#92400e','#ea580c','#fb923c',
+                                 '#fdba74','#fed7aa'];
+
+            function draw(canvasId, data, colors, title) {
+                const canvas = document.getElementById(canvasId);
+                const ctx = canvas.getContext('2d');
+                const wrap = canvas.parentElement;
+                const w = wrap.clientWidth || 360;
+                const h = 220;
+                canvas.width = w;
+                canvas.height = h;
+
+                const maxVal = Math.max(...data, 0.01);
+                const barW = (w - 60) / 12;
+                const barGap = 4;
+                const leftM = 30;
+                const bottomM = 30;
+                const chartH = h - bottomM - 20;
+
+                // Background
+                ctx.fillStyle = '#0f0f1a';
+                ctx.fillRect(0, 0, w, h);
+
+                // Grid lines
+                ctx.strokeStyle = '#1e293b';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= 4; i++) {
+                    const y = 20 + (chartH * i / 4);
+                    ctx.beginPath();
+                    ctx.moveTo(leftM, y);
+                    ctx.lineTo(w - 10, y);
+                    ctx.stroke();
+                }
+
+                // Bars
+                data.forEach((val, i) => {
+                    const x = leftM + i * barW + barGap / 2;
+                    const barHeight = (val / maxVal) * chartH;
+                    const y = 20 + chartH - barHeight;
+
+                    // Gradient
+                    const grad = ctx.createLinearGradient(x, y + barHeight, x, y);
+                    grad.addColorStop(0, colors[i] + '40');
+                    grad.addColorStop(1, colors[i]);
+
+                    ctx.fillStyle = grad;
+                    ctx.fillRect(x, y, barW - barGap, barHeight);
+
+                    // Border
+                    ctx.strokeStyle = colors[i];
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(x, y, barW - barGap, barHeight);
+
+                    // Label
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.font = '11px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(noteLabels[i], x + (barW - barGap) / 2, h - 10);
+
+                    // Value
+                    ctx.fillStyle = '#e2e8f0';
+                    ctx.font = '9px monospace';
+                    ctx.fillText(val.toFixed(2), x + (barW - barGap) / 2, y - 4);
+                });
+
+                // Y-axis label
+                ctx.fillStyle = '#64748b';
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText(maxVal.toFixed(2), leftM - 6, 25);
+                ctx.fillText('0', leftM - 6, 20 + chartH + 3);
+            }
+
+            draw('chromaOrigCanvas', chromaOrig, colorsOrig, 'Original');
+            draw('chromaSynthCanvas', chromaSynth, colorsSynth, 'Synthesized');
+
+            // Pearson correlation
+            const n = 12;
+            const sumO = chromaOrig.reduce((a, b) => a + b, 0);
+            const sumS = chromaSynth.reduce((a, b) => a + b, 0);
+            const sumO2 = chromaOrig.reduce((a, b) => a + b * b, 0);
+            const sumS2 = chromaSynth.reduce((a, b) => a + b * b, 0);
+            let sumOS = 0;
+            for (let i = 0; i < n; i++) sumOS += chromaOrig[i] * chromaSynth[i];
+
+            const num = n * sumOS - sumO * sumS;
+            const denO = Math.sqrt(n * sumO2 - sumO * sumO);
+            const denS = Math.sqrt(n * sumS2 - sumS * sumS);
+            const corr = denO > 0 && denS > 0 ? num / (denO * denS) : 0;
+            const corrClamped = Math.max(-1, Math.min(1, corr));
+
+            const corrEl = document.getElementById('chromaCorrValue');
+            const corrDesc = document.getElementById('chromaCorrDesc');
+            corrEl.textContent = corrClamped.toFixed(3);
+
+            if (corrClamped >= 0.8) {
+                corrEl.className = 'chroma-correlation-value good';
+                corrDesc.textContent = 'Высокое сходство тонального профиля';
+            } else if (corrClamped >= 0.5) {
+                corrEl.className = 'chroma-correlation-value warning';
+                corrDesc.textContent = 'Умеренное сходство, есть отличия в гармонии';
+            } else {
+                corrEl.className = 'chroma-correlation-value bad';
+                corrDesc.textContent = 'Низкое сходство, тональный профиль сильно отличается';
+            }
+        }
+
         function drawSpectrogram(specData) {
             const canvas = document.getElementById('specCanvas');
             const ctx = canvas.getContext('2d');
@@ -1302,7 +1518,7 @@ function checkHealth() {
         <footer class="app-footer" id="appFooter">
             <div class="footer-block">
                 <span class="footer-label">Фронтенд</span>
-                <span class="footer-version" id="frontendVersion">5.0</span>
+                <span class="footer-version" id="frontendVersion">6.1</span>
                 <span class="footer-status online" id="frontendStatus" title="Фронтенд загружен"></span>
             </div>
             <div class="footer-block">
