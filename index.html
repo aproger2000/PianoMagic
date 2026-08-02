@@ -543,6 +543,16 @@
                     <button onclick="toggleStaffPlay()" id="staffPlayBtn">▶ Играть</button>
                     <span class="staff-time" id="staffTime">0.0s / 0.0s</span>
                 </div>
+                <div class="piano-legend" style="margin-top:12px">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background:#6366f1"></div>
+                        <span>Правая рука (мелодия)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background:#f59e0b;opacity:0.6"></div>
+                        <span>Левая рука (аккомпанемент)</span>
+                    </div>
+                </div>
             </div>
        <div class="actions">
                 <a class="btn btn-download" id="downloadPdf" target="_blank">
@@ -819,8 +829,8 @@
                 audioPlayer.src = API_BASE + '/download/' + currentJobId + '.wav';
 
                 // Staff notation - render melody on music staff
-                if (data.melody_rh && data.melody_rh.length > 0) {
-                    renderStaff(data.melody_rh || [], data.duration || 0);
+                if ((data.melody_rh && data.melody_rh.length > 0) || (data.melody_lh && data.melody_lh.length > 0)) {
+                    renderStaff(data.melody_rh || [], data.melody_lh || [], data.duration || 0);
                     document.getElementById('staffSection').classList.add('visible');
                 }
 
@@ -948,16 +958,21 @@
         // ==========================================
         // STAFF NOTATION (Real-time synced with original)
         // ==========================================
-        function renderStaff(notes, duration) {
-            staffNotes = notes;
+        function renderStaff(rhNotes, lhNotes, duration) {
+            const allNotes = [];
+            (rhNotes || []).forEach((n, i) => allNotes.push({...n, hand: 'RH', idx: i}));
+            (lhNotes || []).forEach((n, i) => allNotes.push({...n, hand: 'LH', idx: i}));
+            allNotes.sort((a, b) => a.start - b.start);
+
+            staffNotes = allNotes;
             staffDuration = duration;
             const svg = document.getElementById('staffSvg');
-            const PPS = 140; // pixels per second
+            const PPS = 200; // pixels per second (zoomed in)
             const LM = 80;   // left margin for clef
             const RM = 40;   // right margin
             const W = Math.max(800, duration * PPS + LM + RM);
-            const H = 280;
-            const staffBaseY = 180; // E4 line position
+            const H = 320;
+            const staffBaseY = 220; // E4 line position
             const lineSpace = 12;   // pixels between staff lines
 
             svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
@@ -978,7 +993,7 @@
                 svg.appendChild(line);
             });
 
-            // G Clef (simplified glyph)
+            // G Clef
             const clef = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             clef.setAttribute('x', 5);
             clef.setAttribute('y', staffBaseY - 2 * lineSpace + 18);
@@ -988,21 +1003,21 @@
             clef.textContent = '𝄞';
             svg.appendChild(clef);
 
-            // Time ruler (bottom)
+            // Time ruler
             for (let t = 0; t <= duration; t += 1) {
                 const x = LM + t * PPS;
                 const tick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
                 tick.setAttribute('x1', x);
-                tick.setAttribute('y1', H - 30);
+                tick.setAttribute('y1', H - 50);
                 tick.setAttribute('x2', x);
-                tick.setAttribute('y2', H - 20);
+                tick.setAttribute('y2', H - 40);
                 tick.setAttribute('stroke', '#475569');
                 tick.setAttribute('stroke-width', '1');
                 svg.appendChild(tick);
 
                 const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                 label.setAttribute('x', x);
-                label.setAttribute('y', H - 8);
+                label.setAttribute('y', H - 25);
                 label.setAttribute('text-anchor', 'middle');
                 label.setAttribute('font-size', '10');
                 label.setAttribute('fill', '#64748b');
@@ -1011,13 +1026,16 @@
                 svg.appendChild(label);
             }
 
-            // Draw notes
-            notes.forEach((n, idx) => {
-                const x = LM + n.start * PPS;
-                const w = Math.max(10, n.dur * PPS);
-                const y = staffBaseY - (n.pitch - 64) * lineSpace / 2;
+            // Draw ALL notes (RH + LH)
+            const noteNames = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 
-                // Ledger lines for notes outside staff
+            allNotes.forEach((n, idx) => {
+                const x = LM + n.start * PPS;
+                const w = Math.max(8, n.dur * PPS);
+                const y = staffBaseY - (n.pitch - 64) * lineSpace / 2;
+                const isRH = n.hand === 'RH';
+
+                // Ledger lines
                 if (n.pitch < 64) {
                     for (let p = 62; p >= n.pitch; p -= 2) {
                         const ly = staffBaseY - (p - 64) * lineSpace / 2;
@@ -1048,59 +1066,65 @@
                 ellipse.setAttribute('cx', x + w / 2);
                 ellipse.setAttribute('cy', y);
                 ellipse.setAttribute('rx', w / 2);
-                ellipse.setAttribute('ry', lineSpace * 0.75);
+                ellipse.setAttribute('ry', isRH ? lineSpace * 0.85 : lineSpace * 0.65);
                 ellipse.setAttribute('class', 'staff-note');
                 ellipse.setAttribute('data-start', n.start);
                 ellipse.setAttribute('data-dur', n.dur);
                 ellipse.setAttribute('data-pitch', n.pitch);
+                ellipse.setAttribute('data-hand', n.hand);
                 ellipse.setAttribute('id', 'staff-note-' + idx);
-                ellipse.setAttribute('title', midiToName(n.pitch) + ' @ ' + n.start.toFixed(2) + 's');
+                ellipse.setAttribute('title', noteNames[n.pitch % 12] + (n.pitch//12 - 1) + ' @ ' + n.start.toFixed(2) + 's');
+
+                if (!isRH) {
+                    ellipse.style.fill = 'var(--accent)';
+                    ellipse.style.stroke = 'var(--accent)';
+                    ellipse.style.opacity = '0.55';
+                }
                 svg.appendChild(ellipse);
 
-                // Sharp sign if needed
-                const noteNames = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+                // Sharp sign
                 const name = noteNames[n.pitch % 12];
                 if (name.includes('#')) {
                     const sharp = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    sharp.setAttribute('x', x - 8);
+                    sharp.setAttribute('x', x - 10);
                     sharp.setAttribute('y', y + 4);
                     sharp.setAttribute('font-size', '14');
-                    sharp.setAttribute('fill', '#e2e8f0');
+                    sharp.setAttribute('fill', isRH ? '#e2e8f0' : '#f59e0b');
                     sharp.setAttribute('class', 'note-sharp');
                     sharp.textContent = '♯';
                     svg.appendChild(sharp);
                 }
 
-                // Note label (small)
-                const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                lbl.setAttribute('x', x + w / 2);
-                lbl.setAttribute('y', y - lineSpace);
-                lbl.setAttribute('text-anchor', 'middle');
-                lbl.setAttribute('font-size', '9');
-                lbl.setAttribute('fill', '#94a3b8');
-                lbl.setAttribute('font-family', 'monospace');
-                lbl.textContent = name;
-                svg.appendChild(lbl);
+                // Small label for RH only (to avoid clutter)
+                if (isRH && w > 20) {
+                    const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    lbl.setAttribute('x', x + w / 2);
+                    lbl.setAttribute('y', y - lineSpace - 2);
+                    lbl.setAttribute('text-anchor', 'middle');
+                    lbl.setAttribute('font-size', '8');
+                    lbl.setAttribute('fill', '#94a3b8');
+                    lbl.setAttribute('font-family', 'monospace');
+                    lbl.textContent = name;
+                    svg.appendChild(lbl);
+                }
             });
 
-            // Playhead line
+            // Playhead
             const playhead = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             playhead.setAttribute('x1', LM);
             playhead.setAttribute('y1', 10);
             playhead.setAttribute('x2', LM);
-            playhead.setAttribute('y2', H - 35);
+            playhead.setAttribute('y2', H - 55);
             playhead.setAttribute('class', 'playhead');
             playhead.setAttribute('id', 'staffPlayhead');
             svg.appendChild(playhead);
 
-            // Playhead triangle marker
             const marker = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
             marker.setAttribute('points', `${LM-6},10 ${LM+6},10 ${LM},18`);
             marker.setAttribute('fill', '#ef4444');
             marker.setAttribute('id', 'staffPlayheadMarker');
             svg.appendChild(marker);
 
-            // Setup sync
             setupStaffSync(PPS, LM, duration);
         }
 
@@ -1117,23 +1141,28 @@
                     const t = Math.min(player.currentTime, staffDuration);
                     const x = lm + t * pps;
 
-                    // Scroll to keep playhead centered
-                    const targetScroll = x - container.clientWidth / 2;
-                    container.scrollLeft += (targetScroll - container.scrollLeft) * 0.1;
+                    container.scrollLeft += (x - container.clientWidth / 2 - container.scrollLeft) * 0.1;
 
-                    // Move playhead
                     playhead.setAttribute('x1', x);
                     playhead.setAttribute('x2', x);
                     marker.setAttribute('points', `${x-6},10 ${x+6},10 ${x},18`);
 
-                    // Highlight active notes
                     notes.forEach(n => {
                         const ns = parseFloat(n.getAttribute('data-start'));
                         const nd = parseFloat(n.getAttribute('data-dur'));
+                        const hand = n.getAttribute('data-hand');
                         if (t >= ns && t <= ns + nd) {
                             n.classList.add('active');
+                            if (hand === 'LH') {
+                                n.style.opacity = '1';
+                                n.style.fill = '#fbbf24';
+                            }
                         } else {
                             n.classList.remove('active');
+                            if (hand === 'LH') {
+                                n.style.opacity = '0.55';
+                                n.style.fill = 'var(--accent)';
+                            }
                         }
                     });
 
@@ -1145,28 +1174,10 @@
             if (staffRafId) cancelAnimationFrame(staffRafId);
             staffRafId = requestAnimationFrame(update);
 
-            // Update button state
             const btn = document.getElementById('staffPlayBtn');
             player.addEventListener('play', () => { btn.textContent = '⏸ Пауза'; });
             player.addEventListener('pause', () => { btn.textContent = '▶ Играть'; });
             player.addEventListener('ended', () => { btn.textContent = '▶ Играть'; });
-        }
-
-        function syncStaffToStart() {
-            const player = document.getElementById('originalPlayer');
-            player.currentTime = 0;
-            const container = document.getElementById('staffContainer');
-            container.scrollLeft = 0;
-            document.getElementById('staffTime').textContent = '0.0s / ' + staffDuration.toFixed(1) + 's';
-        }
-
-        function toggleStaffPlay() {
-            const player = document.getElementById('originalPlayer');
-            if (player.paused) {
-                player.play();
-            } else {
-                player.pause();
-            }
         }
 
 function showError(message) {
