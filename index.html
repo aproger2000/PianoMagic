@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PianoMagic 6.1 — Аудио в ноты</title>
+    <title>PianoMagic 5.0 — Аудио в ноты</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -437,13 +437,68 @@
             font-size: 14px;
             font-family: serif;
         }
+
+        /* ===== FOOTER ===== */
+        .app-footer {
+            margin-top: 40px;
+            padding: 20px 25px;
+            background: var(--surface);
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .footer-block {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .footer-label {
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+        .footer-version {
+            font-weight: 700;
+            color: var(--text);
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.9rem;
+        }
+        .footer-status {
+            font-size: 0.8rem;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .footer-status.online {
+            background: var(--success);
+            box-shadow: 0 0 6px var(--success);
+        }
+        .footer-status.offline {
+            background: var(--danger);
+            box-shadow: 0 0 6px var(--danger);
+        }
+        .footer-api {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .footer-api.online { color: var(--success); }
+        .footer-api.offline { color: var(--danger); }
 </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>🎹 PianoMagic</h1>
-            <div class="version">Версия 6.1 — Universal Melody Fitter</div>
+            <div class="version">Версия 5.0 — Universal Melody Fitter</div>
             <p>Загрузите любую мелодию — получите фортепианную партию для двух рук</p>
         </header>
 
@@ -1193,6 +1248,45 @@ function showError(message) {
         // HEALTH CHECK
         // ==========================================
         async function checkHealth() {
+            const backendStatus = document.getElementById('backendStatus');
+            const backendVersion = document.getElementById('backendVersion');
+            const apiStatus = document.getElementById('apiStatus');
+            const frontendStatus = document.getElementById('frontendStatus');
+
+            // Frontend always online if page loaded
+            if (frontendStatus) {
+                frontendStatus.className = 'footer-status online';
+                frontendStatus.title = 'Фронтенд загружен';
+            }
+
+            try {
+                const res = await fetch(API_BASE + '/', { method: 'GET', mode: 'cors' });
+                const data = await res.json();
+                console.log('API Health:', data);
+
+                if (backendVersion) backendVersion.textContent = data.version || '?.?.?';
+                if (backendStatus) {
+                    backendStatus.className = 'footer-status online';
+                    backendStatus.title = `Движок: ${data.engine || 'unknown'}`;
+                }
+                if (apiStatus) {
+                    apiStatus.textContent = `API: ${data.status || 'ok'}`;
+                    apiStatus.className = 'footer-api online';
+                }
+            } catch (err) {
+                console.warn('API недоступен:', err.message);
+                if (backendVersion) backendVersion.textContent = '—';
+                if (backendStatus) {
+                    backendStatus.className = 'footer-status offline';
+                    backendStatus.title = 'API недоступен';
+                }
+                if (apiStatus) {
+                    apiStatus.textContent = 'API: offline';
+                    apiStatus.className = 'footer-api offline';
+                }
+            }
+        }
+function checkHealth() {
             try {
                 const res = await fetch(API_BASE + '/', { method: 'GET' });
                 const data = await res.json();
@@ -1204,5 +1298,21 @@ function showError(message) {
 
         checkHealth();
     </script>
+
+        <footer class="app-footer" id="appFooter">
+            <div class="footer-block">
+                <span class="footer-label">Фронтенд</span>
+                <span class="footer-version" id="frontendVersion">5.0</span>
+                <span class="footer-status online" id="frontendStatus" title="Фронтенд загружен"></span>
+            </div>
+            <div class="footer-block">
+                <span class="footer-api" id="apiStatus">API: проверка...</span>
+            </div>
+            <div class="footer-block">
+                <span class="footer-label">Бэкенд</span>
+                <span class="footer-version" id="backendVersion">—</span>
+                <span class="footer-status" id="backendStatus" title="API статус"></span>
+            </div>
+        </footer>
 </body>
 </html>
