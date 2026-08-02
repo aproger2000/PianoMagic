@@ -1344,7 +1344,7 @@
                 ellipse.setAttribute('data-pitch', n.pitch);
                 ellipse.setAttribute('data-hand', n.hand);
                 ellipse.setAttribute('id', 'staff-note-' + idx);
-                ellipse.setAttribute('title', noteNames[n.pitch % 12] + (n.pitch//12 - 1) + ' @ ' + n.start.toFixed(2) + 's');
+                ellipse.setAttribute('title', noteNames[n.pitch % 12] + Math.floor(n.pitch / 12) - 1 + ' @ ' + n.start.toFixed(2) + 's');
 
                 if (!isRH) {
                     ellipse.style.fill = 'var(--accent)';
