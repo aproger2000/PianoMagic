@@ -1451,6 +1451,25 @@
             player.addEventListener('ended', () => { btn.textContent = '▶ Играть'; });
         }
 
+        function syncStaffToStart() {
+            const player = document.getElementById('originalPlayer');
+            player.currentTime = 0;
+            const container = document.getElementById('staffContainer');
+            if (container) container.scrollLeft = 0;
+            const timeDisplay = document.getElementById('staffTime');
+            if (timeDisplay) timeDisplay.textContent = '0.0s / ' + (staffDuration ? staffDuration.toFixed(1) : '0.0') + 's';
+        }
+
+        function toggleStaffPlay() {
+            const player = document.getElementById('originalPlayer');
+            if (!player) return;
+            if (player.paused) {
+                player.play();
+            } else {
+                player.pause();
+            }
+        }
+
 function showError(message) {
             errorText.textContent = message;
             debugInfo.textContent = 'Debug: API_BASE=' + API_BASE + '\njob_id=' + (currentJobId || 'null');
