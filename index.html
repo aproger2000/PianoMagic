@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PianoMagic 6.1 — Аудио в ноты</title>
+    <title>PianoMagic 6.4 — Аудио в ноты</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -572,7 +572,7 @@
     <div class="container">
         <header>
             <h1>🎹 PianoMagic</h1>
-            <div class="version">Версия 6.1 — Universal Melody Fitter</div>
+            <div class="version">Версия 6.4 — Universal Melody Fitter</div>
             <p>Загрузите любую мелодию — получите фортепианную партию для двух рук</p>
         </header>
 
@@ -1482,20 +1482,28 @@ function showError(message) {
         // ==========================================
         // HEALTH CHECK
         // ==========================================
-        async function checkHealth() {
+        async function checkHealth(retry = 0) {
             const backendStatus = document.getElementById('backendStatus');
             const backendVersion = document.getElementById('backendVersion');
             const apiStatus = document.getElementById('apiStatus');
             const frontendStatus = document.getElementById('frontendStatus');
 
-            // Frontend always online if page loaded
             if (frontendStatus) {
                 frontendStatus.className = 'footer-status online';
-                frontendStatus.title = 'Фронтенд загружен';
+                frontendStatus.title = 'Фронтенд 6.4 загружен';
             }
 
             try {
-                const res = await fetch(API_BASE + '/', { method: 'GET', mode: 'cors' });
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 8000);
+                const res = await fetch(API_BASE + '/', {
+                    method: 'GET',
+                    mode: 'cors',
+                    signal: controller.signal
+                });
+                clearTimeout(timeout);
+
+                if (!res.ok) throw new Error('HTTP ' + res.status);
                 const data = await res.json();
                 console.log('API Health:', data);
 
@@ -1505,15 +1513,20 @@ function showError(message) {
                     backendStatus.title = `Движок: ${data.engine || 'unknown'}`;
                 }
                 if (apiStatus) {
-                    apiStatus.textContent = `API: ${data.status || 'ok'}`;
+                    apiStatus.textContent = `API: ${data.status || 'ok'} v${data.version || '?'}`;
                     apiStatus.className = 'footer-api online';
                 }
             } catch (err) {
-                console.warn('API недоступен:', err.message);
+                console.warn('API недоступен (попытка ' + (retry + 1) + '):', err.message);
+                if (retry < 2) {
+                    apiStatus.textContent = 'API: пробуждение...';
+                    setTimeout(() => checkHealth(retry + 1), 3000);
+                    return;
+                }
                 if (backendVersion) backendVersion.textContent = '—';
                 if (backendStatus) {
                     backendStatus.className = 'footer-status offline';
-                    backendStatus.title = 'API недоступен';
+                    backendStatus.title = 'API недоступен — сервер спит (Render free tier)';
                 }
                 if (apiStatus) {
                     apiStatus.textContent = 'API: offline';
@@ -1527,7 +1540,7 @@ function showError(message) {
         <footer class="app-footer" id="appFooter">
             <div class="footer-block">
                 <span class="footer-label">Фронтенд</span>
-                <span class="footer-version" id="frontendVersion">6.1</span>
+                <span class="footer-version" id="frontendVersion">6.4</span>
                 <span class="footer-status online" id="frontendStatus" title="Фронтенд загружен"></span>
             </div>
             <div class="footer-block">
