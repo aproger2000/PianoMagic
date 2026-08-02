@@ -1470,7 +1470,7 @@
             }
         }
 
-function showError(message) {
+        function showError(message) {
             errorText.textContent = message;
             debugInfo.textContent = 'Debug: API_BASE=' + API_BASE + '\njob_id=' + (currentJobId || 'null');
             errorSection.classList.add('visible');
@@ -1521,7 +1521,8 @@ function showError(message) {
                 }
             }
         }
-function checkHealth() {
+        
+        function checkHealth() {
             try {
                 const res = await fetch(API_BASE + '/', { method: 'GET' });
                 const data = await res.json();
