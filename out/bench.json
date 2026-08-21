@@ -1,0 +1,38 @@
+{
+  "mono": {
+    "ref_notes": 59,
+    "est_notes": 70,
+    "matched": 59,
+    "exact": 59,
+    "octave_off": 0,
+    "missed": 0,
+    "spurious": 11,
+    "precision": 0.8428571428571429,
+    "recall": 1.0,
+    "f1": 0.9147286821705426,
+    "contour": 0.9830508474576272,
+    "contour_wrong": 0,
+    "contour_silent": 1,
+    "engine": "basic-pitch",
+    "key": "F minor",
+    "tempo": 99.4
+  },
+  "poly": {
+    "ref_notes": 59,
+    "est_notes": 81,
+    "matched": 56,
+    "exact": 56,
+    "octave_off": 0,
+    "missed": 3,
+    "spurious": 25,
+    "precision": 0.691358024691358,
+    "recall": 0.9491525423728814,
+    "f1": 0.7999999999999998,
+    "contour": 0.9152542372881356,
+    "contour_wrong": 4,
+    "contour_silent": 1,
+    "engine": "basic-pitch",
+    "key": "C major",
+    "tempo": 99.4
+  }
+}

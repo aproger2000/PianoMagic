@@ -1,0 +1,60 @@
+==============================================================
+PianoMagic run log - task 284d4dca-2947-44bc-9764-307e7ea3c5dd
+started (UTC)           : 2026-08-21T19:54:19.320435
+source file             : reference_poly.wav
+PianoMagic backend      : v7.8.2
+Python                  : 3.10.21 (Linux-6.8.0-1051-aws-x86_64-with-glibc2.41)
+numpy                   : 2.2.6
+scipy                   : 1.15.3
+librosa                 : 0.11.0
+soundfile               : 0.14.0
+basic_pitch             : 0.4.0
+onnxruntime             : 1.23.2
+tensorflow              : NOT INSTALLED
+tflite_runtime          : NOT INSTALLED
+basic-pitch importable  : True
+basic-pitch default path: /usr/local/lib/python3.10/site-packages/basic_pitch/saved_models/icassp_2022/nmp.onnx
+  candidate [present]   : /usr/local/lib/python3.10/site-packages/basic_pitch/saved_models/icassp_2022/nmp.onnx
+  candidate [present]   : /usr/local/lib/python3.10/site-packages/basic_pitch/saved_models/icassp_2022/nmp
+  candidate [present]   : /usr/local/lib/python3.10/site-packages/basic_pitch/saved_models/icassp_2022/nmp.tflite
+  candidate [present]   : /usr/local/lib/python3.10/site-packages/basic_pitch/saved_models/icassp_2022/nmp.mlpackage
+model loaded from       : /usr/local/lib/python3.10/site-packages/basic_pitch/saved_models/icassp_2022/nmp.onnx
+==============================================================
+[TASK 284d4dca-2947-44bc-9764-307e7ea3c5dd] Loading audio from /tmp/pianomagic_uploads/284d4dca-2947-44bc-9764-307e7ea3c5dd.wav
+[TASK 284d4dca-2947-44bc-9764-307e7ea3c5dd] Audio loaded: 25.95s, 572164 samples
+[EXTRACT] Basic Pitch model: /usr/local/lib/python3.10/site-packages/basic_pitch/saved_models/icassp_2022/nmp.onnx
+[EXTRACT] Running Basic Pitch on _bp_input_bf54a9a757a8452ba0847b4648e73ee3.wav (25.9s)...
+Predicting MIDI for /tmp/pianomagic_uploads/_bp_input_bf54a9a757a8452ba0847b4648e73ee3.wav...
+[EXTRACT] Basic Pitch returned 563 note events
+[EXTRACT] amplitude: peak=0.803 min=0.162 median=0.460; kept 563/563 above 5% of peak
+[EXTRACT] harmonic suppression: 301/563 candidates look like partials of a concurrent lower note (+12st:221, +19st:33, +24st:20, +28st:20, +31st:7)
+[EXTRACT] split at MIDI 57 (cluster separation 24 st): 279 melody candidates from MIDI 50 up / 360 lower candidates
+[EXTRACT] melody @bias 0.000: home register MIDI 65 (pass 1: 68 notes -> pass 2: 68 notes)
+[EXTRACT]   bias 0.000: 68 notes, MIDI 60-68, 67% repeat / 24% stepwise / 0% octave+, melodicity -0.097
+[EXTRACT] melody @bias 0.015: home register MIDI 65 (pass 1: 99 notes -> pass 2: 86 notes)
+[EXTRACT]   bias 0.015: 86 notes, MIDI 53-68, 51% repeat / 19% stepwise / 1% octave+, melodicity -0.076
+[EXTRACT] melody @bias 0.030: home register MIDI 65 (pass 1: 101 notes -> pass 2: 101 notes)
+[EXTRACT]   bias 0.030: 101 notes, MIDI 53-80, 37% repeat / 16% stepwise / 22% octave+, melodicity -0.245
+[EXTRACT] melody: chose pitch_bias 0.015 (melodicity -0.076, best -0.076)
+[EXTRACT] octave consistency: moved 3 notes (53->65, 55->67)
+[EXTRACT] melody-only mode: bass line not transcribed
+[EXTRACT] line selection: RH=86 notes (range 60-68 st, 5 distinct pitches, 52% repeat / 20% stepwise / 0% octave+, longest run on one pitch 5), LH=0 notes (n/a)
+[EXTRACT] melody pitch histogram: 60x18 64x13 65x29 67x13 68x13
+[EXTRACT] melody durations: median 290 ms, 70-569 ms, commonest 302ms x21 255ms x10 70ms x8 290ms x8 348ms x7 81ms x3 292ms x3 569ms x3
+[EXTRACT] removed 5 duplicate notes (same pitch, same grid slot)
+[EXTRACT] beat grid: 1/4 of a quarter at 99.4 BPM (151 ms), phase 27 ms; mean onset deviation 0.15 -> 0.00 of a grid step
+[EXTRACT] 81 clean notes returned (basic-pitch engine)
+[TASK 284d4dca-2947-44bc-9764-307e7ea3c5dd] Extracted 81 notes via engine=basic-pitch
+[TASK 284d4dca-2947-44bc-9764-307e7ea3c5dd] Synthesizing, dur=25.948s
+[SYNTH] duration=25.948s, samples=572164, notes=81
+[SYNTH] valid_notes=81
+[TASK 284d4dca-2947-44bc-9764-307e7ea3c5dd] Synthesis done, shape=(572164, 2), max=0.9500
+[SCORE] key 'C major' -> signature +0 (none)
+[SCORE] WARNING: 1 of 81 notes did not fit their measure and were omitted from the score
+[TASK 284d4dca-2947-44bc-9764-307e7ea3c5dd] MusicXML generated, len=22047
+[TASK 284d4dca-2947-44bc-9764-307e7ea3c5dd] Saving WAV to /tmp/pianomagic_uploads/PianoMagic_284d4dca-2947-44bc-9764-307e7ea3c5dd.wav
+[TASK 284d4dca-2947-44bc-9764-307e7ea3c5dd] WAV saved, size=2288700 bytes
+[TASK 284d4dca-2947-44bc-9764-307e7ea3c5dd] Saving XML to /tmp/pianomagic_uploads/PianoMagic_284d4dca-2947-44bc-9764-307e7ea3c5dd.xml
+[TASK 284d4dca-2947-44bc-9764-307e7ea3c5dd] XML saved, size=22047 bytes
+[TASK 284d4dca-2947-44bc-9764-307e7ea3c5dd] COMPLETED
+finished (UTC)          : 2026-08-21T19:54:22.015396
